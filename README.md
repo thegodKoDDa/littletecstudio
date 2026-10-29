@@ -8,6 +8,11 @@ Seu teclado macro 12+2 no navegador e no desktop. Interface moderna em Next.js e
 [![Publicar no GitHub Pages](https://github.com/thegodKoDDa/littletec-web/actions/workflows/pages.yml/badge.svg)](https://github.com/thegodKoDDa/littletec-web/actions/workflows/pages.yml)
 [![Licença ISC](https://img.shields.io/badge/licen%C3%A7a-ISC-blue.svg)](LICENSE)
 
+> [!NOTE]
+> **Integração com o LittleTec Studio Desktop:**
+> - Este projeto é a versão web moderna da suíte LittleTec. Se você procura o executável desktop nativo compilado em Python/Qt para Windows (`.exe`), acesse o repositório principal em **[thegodKoDDa/littletec](https://github.com/thegodKoDDa/littletec)**.
+> - A interface visual, os componentes e os recursos desta versão Web servirão de base para a futura convergência visual e unificação definitiva do aplicativo desktop.
+
 ## Teclado de referência compatível
 
 Desenvolvido, mapeado por engenharia reversa e validado especificamente para o mini teclado mecânico programável de **12 teclas + 2 botões giratórios (knobs)** com controlador **WCH CH57x**:

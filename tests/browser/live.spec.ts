@@ -2,6 +2,10 @@ import { test, expect } from "@playwright/test";
 import { exampleProfile, keyboard } from "../../src/lib/profile";
 import type { LiveEvent } from "../../src/lib/live";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('littletec-studio-auto-connect', 'off'));
+});
+
 test("eventos identificados giram o knob, teclas respondem e ambiguidades não inventam movimento", async ({
   page,
 }) => {

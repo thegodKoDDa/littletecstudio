@@ -1,21 +1,11 @@
-import { build } from 'esbuild';
+import { buildClient } from './build-client.mjs';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, readFileSync, rmSync, copyFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 // A entrada portátil renderiza os mesmos componentes, sem depender do servidor Next.
-const output = 'build/web-portable';
-rmSync(output, { recursive: true, force: true });
-mkdirSync(output, { recursive: true });
-await build({
-  entryPoints: ['src/portable.tsx'], bundle: true, minify: true,
-  format: 'iife', platform: 'browser', target: 'es2022', jsx: 'automatic',
-  outfile: `${output}/studio.js`, assetNames: 'assets/[name]-[hash]',
-  loader: { '.ttf': 'file' }, define: { 'process.env.NODE_ENV': '"production"' },
-});
-copyFileSync('src/app/icon.svg', `${output}/icon.svg`);
-writeFileSync(`${output}/index.html`, `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LittleTec Studio — Editor portátil</title><link rel="icon" href="./icon.svg"><link rel="stylesheet" href="./studio.css"><script defer src="./studio.js"></script></head><body><div id="studio"></div></body></html>`);
+await buildClient('build/web-portable');
 const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
 mkdirSync('release', { recursive: true });
 const archive = `release/LittleTec-Studio-Web-${version}.zip`;

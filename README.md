@@ -1,5 +1,7 @@
 # LittleTec Studio
 
+<img src="desktop/icon.png" alt="Símbolo LittleTec Studio" width="72" height="72">
+
 Configurador em português para o teclado macro **12 teclas + 2 giratórios**.
 Uma mesma interface React atende ao **Web** e ao **Desktop Windows**, com serviços
 Python compartilhados para comunicação com o teclado.
@@ -51,6 +53,18 @@ uma pasta Windows ou do checkout WSL: ele prepara a execução em disco local,
 sem exigir instalação de Node.js ou Python. A primeira abertura pode levar mais
 tempo. Não abra o executável interno de `release/win-unpacked` diretamente pelo WSL.
 
+## Conexão ao abrir
+
+O Desktop e o Web local tentam conectar e ler o teclado automaticamente ao abrir.
+O botão **Conectar teclado / Ler teclado** continua disponível. A conexão
+inicial não aplica mapeamento ou iluminação e não substitui um rascunho salvo
+ou uma edição em andamento. Sem teclado ou ponte, o editor continua disponível.
+Pages e o pacote HTML permanecem editores locais, sem tentativa automática USB.
+
+A entrada portátil reaproveita o pacote preparado no Windows, sem extrair um
+ambiente Python a cada abertura. A primeira execução de cada versão prepara o
+pacote uma vez. [Medições e detalhes da otimização](docs/OTIMIZACAO_0.4.0.md).
+
 ## Funcionalidades
 
 - Três camadas, 12 teclas e dois giratórios com esquerda, clique e direita.
@@ -61,6 +75,7 @@ tempo. Não abra o executável interno de `release/win-unpacked` diretamente pel
 - Leitura/aplicação, cópias brutas com hashes, diagnóstico e preservação de dados opacos.
 - Entrada ao vivo Windows, destaques e animações associadas aos comandos identificados.
 - Tema claro/escuro e interface responsiva, compartilhada entre Web e Desktop.
+- Ícone oficial derivado de `desktop/icon.png` nos executáveis, janela, navegador e interface.
 
 USB validado para **1189:8842, modelo 12+2, variante 0**. Outros modelos do catálogo
 são rascunhos, sem suporte USB implícito. LED não tem readback: seleção local e
@@ -71,7 +86,7 @@ ficar inacessível. Firmware, flash e troca de driver não fazem parte do uso no
 ## Continuidade e LittleTec OG
 
 Este repositório continua o antigo `littletec-web`, preservando seu histórico e
-as versões Web anteriores. **LittleTec Studio 0.3.0** reúne a evolução do Web e
+as versões Web anteriores. **LittleTec Studio 0.4.0** reúne a evolução do Web e
 o novo Desktop Electron.
 
 O [LittleTec OG](https://github.com/thegodKoDDa/littletec-og) conserva o desktop

@@ -25,7 +25,7 @@ UNC. Registra falhas em `%LOCALAPPDATA%/LittleTec Desktop/launcher.log`.
 Os fontes, builds e artefatos oficiais continuam neste repositório. O ZIP
 extraído em uma pasta local Windows pode ser aberto diretamente pelo `.exe`.
 
-O pacote unificado é identificado como **0.3.0**. Downloads em [Releases](https://github.com/thegodKoDDa/littletecstudio/releases).
+O pacote unificado é identificado como **0.4.0**. Downloads em [Releases](https://github.com/thegodKoDDa/littletecstudio/releases).
 A confirmação física do Web/Qt anterior não equivale à validação USB do novo
 pacote. Build e smoke não leem, escrevem nem iniciam o monitor do teclado.
 
@@ -41,7 +41,8 @@ src/components + src/lib + src/app/globals.css (interface única)
          bridge/core/littletec: serviços, perfis e protocolo
 ```
 
-O Electron carrega a exportação local da mesma aplicação React. Nenhuma tela
+O Electron carrega um cliente React compilado diretamente dos mesmos componentes
+do Web, sem o runtime Next desnecessário ao desktop. Nenhuma tela
 é reimplementada em Qt ou copiada para uma segunda interface. A rota Web e o
 Electron usam `src/lib/device-command.ts` para validar os mesmos comandos.
 Python mantém I/O serial, revisão de snapshot, cópia, releitura e tentativa de
@@ -127,9 +128,26 @@ incluindo o ZIP completo e seu hash. Não publica nem cria commits, tags ou rele
 Os smokes Electron exigem ambiente gráfico (no CI Linux, usar `xvfb-run`).
 O teste de interface Electron usa perfil temporário e não acessa USB.
 
-O build desktop sempre limpa o `BASE_PATH` da entrega Pages. Executar
-`npm run build:pages` para a entrega Pages e `npm run desktop:pack` para a
-entrega desktop; não distribuir um `out/` de outra modalidade por cópia manual.
+O desktop usa `build/desktop-ui/` (empacotado em `ui/` dentro do asar), o
+editor portátil usa `build/web-portable/` e Pages usa `out/`. Compilar uma
+modalidade não substitui os arquivos de interface da outra.
+
+A entrada `desktop/launcher.cs` é compilada pelo `csc.exe` do .NET Framework
+presente no Windows. O ZIP é um recurso do executável e só é lido/extraído
+quando seu hash ainda não foi preparado em disco local. Não há extração Python
+no caminho de abertura habitual. A ponte continua sendo Python empacotado.
+A janela carrega enquanto a ponte inicializa.
+
+Na execução normal, Desktop e Web local sondam a ponte e fazem uma única
+leitura inicial. Não há aplicação automática de teclas ou LED. Rascunhos são
+mantidos sem confirmação modal na leitura automática. Para iniciar apenas o
+editor, use `LittleTec-Studio.exe --offline`, ou `?offline=1` no Web local.
+O botão manual permanece funcionando. `--smoke` sempre desativa a leitura
+inicial e a ativação do monitor físico.
+
+`desktop/icon.png` é a fonte canônica de identidade. `npm run icons:sync`
+regenera ICO, favicon e ícone Apple. O empacotamento verifica os bytes dos
+ícones realmente presentes no lançador, no Electron e na ponte, em sete tamanhos.
 
 O Electron/Chromium deve acompanhar atualizações de segurança. O pacote ocupa
 mais espaço que uma janela baseada no WebView do sistema. A versão inicial não

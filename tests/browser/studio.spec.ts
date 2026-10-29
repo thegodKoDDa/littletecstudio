@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { newProfile } from "../../src/lib/profile";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('littletec-studio-auto-connect', 'off'));
+});
+
 test("edita, desfaz e preserva o rascunho ao recarregar", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));

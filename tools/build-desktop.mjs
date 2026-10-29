@@ -1,10 +1,7 @@
 import { build } from 'esbuild';
-import { spawnSync } from 'node:child_process';
+import { buildClient } from './build-client.mjs';
 
-const result = spawnSync(process.execPath, ['node_modules/next/dist/bin/next', 'build'], {
-  stdio: 'inherit', env: { ...process.env, STATIC_EXPORT: 'true', BASE_PATH: '' },
-});
-if (result.status !== 0) process.exit(result.status || 1);
+await buildClient('build/desktop-ui');
 for (const entry of ['main', 'preload']) {
   await build({
     entryPoints: [`desktop/${entry}.ts`], bundle: true,

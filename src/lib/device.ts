@@ -2,6 +2,9 @@ import type { Profile } from "./profile";
 import type { LiveEvent, LiveStatus } from "./live";
 
 export type DeviceResult = {
+  bridge?: boolean;
+  usb_platform?: boolean;
+  busy?: boolean;
   message?: string;
   revision?: string;
   profile?: Profile;

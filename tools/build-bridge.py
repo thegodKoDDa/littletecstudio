@@ -18,6 +18,7 @@ def main():
     subprocess.run([
         sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean', '--onedir',
         '--console', '--name', 'LittleTec-Bridge',
+        '--icon', str(ROOT / 'desktop/icon.ico'),
         '--paths', str(ROOT / 'bridge/core'), '--paths', str(ROOT / 'bridge'),
         '--add-data', f'{ROOT / "bridge/core/tools"};tools',
         '--add-data', f'{ROOT / "LICENSE"};licenses',

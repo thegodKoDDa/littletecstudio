@@ -88,7 +88,7 @@ jobs:
           $desktopProcess = Start-Process -FilePath ".\LittleTec-Studio.exe" -ArgumentList "--smoke", "--smoke-close-window" -PassThru
           if (-not $desktopProcess.WaitForExit(120000)) { throw 'Smoke excedeu o prazo.' }
           $report = Get-Content $env:LITTLETEC_SMOKE_REPORT -Raw | ConvertFrom-Json
-          if (-not $report.bridge -or -not $report.packaged -or $report.connected) { throw 'Smoke incompleto.' }
+          if (-not $report.bridge -or -not $report.packaged -or $report.connected -or -not $report.autoConnectDisabled -or -not $report.uiReady -or -not $report.logoLoaded) { throw 'Smoke incompleto.' }
       - uses: actions/upload-artifact@v4
         with:
           name: LittleTec-Studio-Windows-x64

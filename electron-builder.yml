@@ -6,19 +6,21 @@ artifactName: LittleTec-Studio-${version}-win-x64.${ext}
 files:
   - dist-electron/**
   - desktop/icon.png
-  - out/**
+  - from: build/desktop-ui
+    to: ui
+    filter: ['**/*']
   - package.json
   - LICENSE
   - '!node_modules/**/*'
-extraMetadata:
-  version: 0.3.0
 extraResources:
   - from: build/bridge/LittleTec-Bridge
     to: bridge
 win:
+  icon: desktop/icon.ico
   target:
     - target: dir
       arch: [x64]
   executableName: LittleTec-Studio
   signAndEditExecutable: false
 asar: true
+afterPack: tools/after-pack.cjs

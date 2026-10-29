@@ -19,6 +19,9 @@ let quitting = false;
 let stopping = false;
 const origin = 'littletec://studio';
 const smoke = process.argv.includes('--smoke');
+const offline = smoke || process.argv.includes('--offline') || process.env.LITTLETEC_DISABLE_AUTO_CONNECT === '1';
+const started = performance.now();
+const startup: Record<string, number> = {};
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -44,7 +47,7 @@ else {
 
   void app.whenReady().then(async () => {
     const root = app.getAppPath();
-    const staticRoot = path.join(root, 'out');
+    const staticRoot = app.isPackaged ? path.join(root, 'ui') : path.join(root, 'build', 'desktop-ui');
     protocol.handle('littletec', async request => {
       const url = new URL(request.url);
       if (url.host !== 'studio' || request.method !== 'GET') return new Response('', { status: 403 });
@@ -56,7 +59,7 @@ else {
       try {
         const response = await net.fetch(pathToFileURL(filename).href);
         const headers = new Headers(response.headers);
-        headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'");
+        headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'");
         return new Response(response.body, { status: response.status, headers });
       } catch { return new Response('', { status: 404 }); }
     });
@@ -74,7 +77,8 @@ else {
     bridge = app.isPackaged
       ? new DesktopBridge(path.join(process.resourcesPath, 'bridge', 'LittleTec-Bridge.exe'), [], app.getPath('userData'), captures)
       : new DesktopBridge(python, ['-X', 'utf8', path.join(root, 'bridge', 'desktop.py')], root, captures);
-    await bridge.ready;
+    // A interface pode abrir enquanto o processo Python inicializa.
+    void bridge.ready.then(() => { startup.bridgeReadyMs = Math.round(performance.now() - started); }, () => {});
 
     ipcMain.handle('device:request', async (event, command) => {
       if (event.sender !== window?.webContents || !event.senderFrame?.url.startsWith(origin + '/')) {
@@ -115,6 +119,7 @@ else {
       webPreferences: {
         preload: path.join(__dirname, 'preload.cjs'),
         contextIsolation: true, nodeIntegration: false, sandbox: true,
+        additionalArguments: offline ? ['--littletec-offline'] : [],
       },
     });
     window.setMenu(null);
@@ -123,19 +128,31 @@ else {
     window.webContents.on('will-navigate', (event, url) => {
       if (url !== origin + '/') event.preventDefault();
     });
-    window.once('ready-to-show', () => { if (!smoke) window?.show(); });
+    window.once('ready-to-show', () => {
+      startup.firstPaintMs = Math.round(performance.now() - started);
+      if (!smoke) window?.show();
+    });
     await window.loadURL(origin + '/');
+    startup.uiLoadedMs = Math.round(performance.now() - started);
     if (smoke) {
+      let uiReady = false;
+      for (let attempt = 0; attempt < 100 && !uiReady; attempt++) {
+        uiReady = await window.webContents.executeJavaScript("document.documentElement.dataset.studioReady === 'true'");
+        if (!uiReady) await new Promise(resolve => setTimeout(resolve, 50));
+      }
+      if (!uiReady) throw new Error('A interface não inicializou no prazo.');
       await new Promise(resolve => setTimeout(resolve, 500));
       const result = await window.webContents.executeJavaScript(`(async () => {
         const reply = await window.littleTecDesktop.request({operation: 'status'});
-        return {title: document.title, bridge: reply.body.bridge, connected: reply.body.connected, text: document.body.innerText, node: typeof require};
+        return {title: document.title, bridge: reply.body.bridge, connected: reply.body.connected, text: document.body.innerText, node: typeof require,
+          uiReady: document.documentElement.dataset.studioReady === 'true',
+          logoLoaded: document.querySelector('.brand-mark img')?.naturalWidth > 0};
       })()`);
-      if (!result.bridge || result.node !== 'undefined' || !result.text.includes('Mapeamento')) throw new Error('Smoke desktop incompleto.');
+      if (!result.bridge || !result.uiReady || !result.logoLoaded || result.node !== 'undefined' || !result.text.includes('Mapeamento')) throw new Error('Smoke desktop incompleto.');
       if (process.env.LITTLETEC_SMOKE_REPORT) {
         const destination = process.env.LITTLETEC_SMOKE_REPORT;
         await mkdir(path.dirname(destination), { recursive: true });
-        await writeFile(destination, JSON.stringify({ ...result, packaged: app.isPackaged, platform: process.platform }, null, 2));
+        await writeFile(destination, JSON.stringify({ ...result, packaged: app.isPackaged, platform: process.platform, autoConnectDisabled: offline, startup }, null, 2));
         const screenshot = await window.webContents.capturePage();
         await writeFile(destination + '.png', screenshot.toPNG());
       }

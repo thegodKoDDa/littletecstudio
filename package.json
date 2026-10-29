@@ -1,6 +1,6 @@
 {
   "name": "littletecstudio",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "node tools/run-local.mjs dev",
@@ -19,7 +19,13 @@
     "test:desktop": "tsx --test tests/desktop*.test.ts",
     "test:desktop:ui": "playwright test --config playwright.desktop.config.ts",
     "web:pack": "node tools/package-web.mjs",
-    "test:web:portable": "playwright test --config playwright.portable.config.ts"
+    "test:web:portable": "playwright test --config playwright.portable.config.ts",
+    "icons:sync": "node tools/sync-icons.mjs",
+    "predev": "npm run icons:sync",
+    "predev:ui": "npm run icons:sync",
+    "prebuild": "npm run icons:sync",
+    "prebuild:static": "npm run icons:sync",
+    "prebuild:pages": "npm run icons:sync"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -36,6 +42,7 @@
     "electron": "^45.1.0",
     "electron-builder": "^26.18.0",
     "esbuild": "^0.28.2",
+    "sharp": "^0.35.5",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0"
   },

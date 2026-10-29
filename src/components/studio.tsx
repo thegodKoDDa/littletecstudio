@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   Sun,
   Moon,
@@ -10,7 +10,6 @@ import {
   Check,
   ChevronDown,
   CircleHelp,
-  Command,
   Copy,
   Download,
   FilePlus2,
@@ -48,6 +47,8 @@ import {
   positionLabel,
 } from "@/lib/profile";
 import { deviceRequest } from "@/lib/device";
+import { shouldAutoConnect } from "@/lib/auto-connect";
+import { ProjectLogo } from "./project-logo";
 import { Board } from "./board";
 import { ActionEditor } from "./action-editor";
 import { LivePanel } from "./live-panel";
@@ -116,6 +117,9 @@ export function Studio() {
     revision,
   );
   const hasDraft = useRef(false);
+  const operationInFlight = useRef(false);
+  const connectionEstablished = useRef(false);
+  const autoAttempted = useRef(false);
   const [ready, setReady] = useState(false);
   const isDesktop = ready && typeof window !== "undefined" && !!window.littleTecDesktop;
   const [review, setReview] = useState(false);
@@ -132,13 +136,14 @@ export function Studio() {
   const backupFolderRef = useRef<HTMLInputElement>(null);
   const profileRef = useRef(profile);
   profileRef.current = profile;
-  const changes = differences(baseline, profile);
+  const changes = useMemo(() => differences(baseline, profile), [baseline, profile]);
+  const serializedProfile = useMemo(() => JSON.stringify(profile), [profile]);
   const currentChanges = changes
     .filter((d) => d.layer === layer)
     .map((d) => d.position);
   const lighting = profile.lighting[layer];
   const color = lighting.color ? catalog.COLORS[lighting.color][1] : "#77808b";
-  const dirty = JSON.stringify(profile) !== fileSaved;
+  const dirty = serializedProfile !== fileSaved;
   useEffect(() => {
     try {
       const draft = localStorage.getItem(storageKey);
@@ -166,9 +171,28 @@ export function Studio() {
     setReady(true);
   }, []);
   useEffect(() => {
+    if (!ready || autoAttempted.current) return;
+    let preference: string | null = null;
+    try { preference = localStorage.getItem('littletec-studio-auto-connect'); } catch { /* Sem preferência persistida. */ }
+    if (!shouldAutoConnect(window.location, window.littleTecDesktop, preference)) return;
+    autoAttempted.current = true;
+    const controller = new AbortController();
+    void (async () => {
+      try {
+        const status = await deviceRequest('status', {}, controller.signal);
+        if (controller.signal.aborted || !status.bridge || !status.usb_platform || status.busy || connectionEstablished.current || operationInFlight.current) return;
+        await run('read', {}, { automatic: true, signal: controller.signal });
+      } catch { /* Editor e botão manual continuam disponíveis sem a ponte. */ }
+    })();
+    return () => controller.abort();
+  }, [ready]);
+  useEffect(() => {
+    if (ready) document.documentElement.dataset.studioReady = 'true';
+  }, [ready]);
+  useEffect(() => {
     if (ready) {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(profile));
+        localStorage.setItem(storageKey, serializedProfile);
       } catch {
         setNotice({
           text: "O navegador não conseguiu salvar o rascunho. Exporte o perfil para preservar seu trabalho.",
@@ -176,7 +200,7 @@ export function Studio() {
         });
       }
     }
-  }, [profile, ready]);
+  }, [serializedProfile, ready]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(null), 8000);
@@ -268,6 +292,7 @@ export function Studio() {
   useEffect(() => {
     if (live.view.disconnected) {
       setConnected(false);
+      connectionEstablished.current = false;
       setRevision("");
       setNotice({
         text: "Teclado desconectado. Seu rascunho foi mantido.",
@@ -355,8 +380,9 @@ export function Studio() {
     setProfile(future[0]);
     setFuture((f) => f.slice(1));
   }
-  async function run(operation: string, payload: Record<string, unknown> = {}) {
-    if (busy) return;
+  async function run(operation: string, payload: Record<string, unknown> = {}, options: { automatic?: boolean; signal?: AbortSignal } = {}) {
+    if (operationInFlight.current) return;
+    operationInFlight.current = true;
     const sent = structuredClone(profile);
     setBusy(operation);
     setNotice(null);
@@ -364,12 +390,13 @@ export function Studio() {
       const result = await deviceRequest(operation, {
         ...payload,
         ...(revision ? { revision } : {}),
-      });
+      }, options.signal);
       if (result.revision) setRevision(result.revision);
       if (operation === "read" && result.profile) {
         const p = parseProfile(result.profile);
         setBaseline(p);
         setConnected(true);
+        connectionEstablished.current = true;
         setLiveAvailable(result.liveAvailable === true);
         if (result.lastLighting)
           setLastSent(
@@ -384,6 +411,10 @@ export function Studio() {
             }),
           );
         if (JSON.stringify(profileRef.current) === JSON.stringify(sent)) {
+          if (hasDraft.current && options.automatic) {
+            setNotice({ text: 'Teclado conectado automaticamente. Seu rascunho foi mantido.' });
+            return;
+          }
           if (
             hasDraft.current &&
             !window.confirm(
@@ -450,13 +481,15 @@ export function Studio() {
         );
       if (["read", "apply", "led", "led_all"].includes(operation)) {
         setConnected(false);
+        connectionEstablished.current = false;
         setRevision("");
       }
-      setNotice({
+      if (!options.automatic) setNotice({
         text: e instanceof Error ? e.message : "Falha na operação.",
         error: true,
       });
     } finally {
+      operationInFlight.current = false;
       setBusy("");
     }
   }
@@ -555,7 +588,7 @@ export function Studio() {
       <aside className="sidebar">
         <a className="brand" href="#" onClick={() => setPage("Mapeamento")} aria-label="LittleTec Studio início">
           <span className="brand-mark">
-            <Command size={21} />
+            <ProjectLogo />
           </span>
           <span>
             little<span>tec</span>

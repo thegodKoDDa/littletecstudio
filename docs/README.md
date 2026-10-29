@@ -1,6 +1,7 @@
 # Documentação — LittleTec Studio
 
 - [Estado atual e versões](ESTADO_ATUAL.md).
+- [Ícone, abertura e conexão automática na 0.4.0](OTIMIZACAO_0.4.0.md).
 - [Uso, formatos e comandos](../README.md).
 - [Desktop, arquitetura compartilhada e build](DESKTOP.md).
 - [Reorganização, transferência e preservação do OG](REORGANIZACAO_20261029.md).

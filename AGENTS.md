@@ -26,3 +26,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Conversar e documentar em português. Commits/publicações exigem pedido específico;
   a reorganização e publicação de 29/10/2026 foram explicitamente autorizadas pelo usuário.
 - Não copiar mudanças manualmente entre duas interfaces. Gerar Web e Desktop da mesma base.
+
+## Abertura e identidade — Studio 0.4.0
+
+- `desktop/icon.png` é a fonte do símbolo; gerar variantes com `npm run icons:sync`.
+- Desktop e Web local leem automaticamente ao abrir, por pedido do usuário;
+  isso não autoriza aplicação de teclas/LED na inicialização.
+- Preservar rascunhos e edições durante a leitura automática; manter botão manual.
+- Smokes usam `--smoke`/`--offline` e testes simulam a conexão. Não fazer ensaios
+  físicos por rotina nem iniciar o monitor em build/teste.
+- O lançador portátil está em `desktop/launcher.cs`, com ZIP embutido e cache
+  por versão. Não reintroduzir extração de Python/payload em cada abertura.
+- Saídas separadas: `build/desktop-ui`, `build/web-portable`, `out` para Pages.

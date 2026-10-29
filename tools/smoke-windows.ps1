@@ -17,7 +17,7 @@ if (Test-Path -LiteralPath $entry) {
     & (Join-Path $PSScriptRoot 'launch-desktop.ps1') -Smoke -CloseWindowSmoke:$CloseWindow
 }
 $report = Get-Content -LiteralPath $env:LITTLETEC_SMOKE_REPORT -Raw -Encoding UTF8 | ConvertFrom-Json
-if (-not $report.bridge -or -not $report.packaged -or $report.platform -ne 'win32' -or $report.connected -or $report.node -ne 'undefined') {
+if (-not $report.bridge -or -not $report.packaged -or $report.platform -ne 'win32' -or $report.connected -or $report.node -ne 'undefined' -or -not $report.autoConnectDisabled -or -not $report.uiReady -or -not $report.logoLoaded) {
     throw 'Smoke Windows incompleto.'
 }
 Write-Host 'Windows: interface e ponte empacotadas verificadas, sem operacao USB.'

@@ -1,4 +1,4 @@
-# Estado atual — LittleTec Studio 0.3.0
+# Estado atual — LittleTec Studio 0.4.0
 
 Atualizado em **29/10/2026**.
 
@@ -15,6 +15,19 @@ com desenvolvimento encerrado.
 - Entrada desktop local: `LittleTec-Studio.exe`, na raiz, com pacote embutido e
   preparação automática para disco Windows, inclusive ao abrir pelo WSL.
 - USB no Web local usa Python Windows e relay WSL. Pages/HTML não incluem a ponte.
+
+## Abertura e conexão na 0.4.0
+
+O símbolo canônico é `desktop/icon.png`. O build gera os tamanhos e incorpora o
+mesmo símbolo nos executáveis, janela, navegador, atalhos Web e marca da interface.
+A entrada portátil usa o .NET Framework do Windows, sem extração Python em cada
+abertura; o pacote é preparado uma vez por hash de versão.
+
+Desktop e Web local tentam ler o teclado ao abrir, sem enviar alterações.
+Rascunhos salvos ou editados durante a leitura são preservados e o botão manual
+continua disponível. Pages/HTML não tentam acessar uma ponte USB remota.
+Smokes e testes desabilitam a leitura automática ou simulam o transporte.
+Ver [otimização e medições](OTIMIZACAO_0.4.0.md).
 
 ## Confirmações e limites
 

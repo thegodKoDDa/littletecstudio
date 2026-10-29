@@ -1,4 +1,14 @@
-# LittleTec Web
+# LittleTec Studio
+
+## 0.4.0 — 29/10/2026
+
+- Ícone oficial único em `desktop/icon.png`, com ICO multirresolução para executáveis e ícones Web.
+- Lançador Windows leve, com pacote embutido e cache por versão, sem extração Python repetida.
+- Interface desktop independente da inicialização da ponte, usando o mesmo cliente React do editor portátil.
+- Conexão e leitura automáticas no Desktop e Web local, preservando o botão manual e os rascunhos.
+- Builds Web e Desktop em saídas separadas; memoização da revisão e serialização do perfil durante entrada ao vivo.
+- Verificação dos ícones incorporados, teste da interface com ponte atrasada e testes de conexão automática sem hardware.
+
 
 ## 0.3.0 — 29/10/2026
 

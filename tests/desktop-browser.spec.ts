@@ -38,28 +38,48 @@ for line in sys.stdin:
   }
 });
 
-test('a interface fica utilizável antes de a ponte terminar de iniciar', async () => {
+test('a interface fica utilizável antes de a ponte terminar de iniciar', async ({}, testInfo) => {
   test.skip(process.platform === 'win32', 'O invólucro de Python deste teste usa shebang POSIX.');
   const profile = await mkdtemp(path.join(os.tmpdir(), 'littletec-bridge-startup-'));
   const gate = path.join(profile, 'continue');
   const python = path.join(profile, 'python-delayed');
-  await writeFile(python, `#!/usr/bin/env python3\nimport pathlib,os,sys,time\nwhile not pathlib.Path(${JSON.stringify(gate)}).exists(): time.sleep(0.02)\nos.execvp('python3', ['python3', *sys.argv[1:]])\n`, { mode: 0o755 });
-  const application = await electron.launch({
-    args: ['.'], cwd: process.cwd(),
-    env: { ...process.env, LITTLETEC_TEST_USER_DATA: profile, LITTLETEC_DISABLE_AUTO_CONNECT: '1', LITTLETEC_PYTHON: python },
-  });
+  await writeFile(python, `#!/usr/bin/env python3
+import pathlib,os,sys,time
+started=time.monotonic()
+while not pathlib.Path(${JSON.stringify(gate)}).exists():
+ if time.monotonic()-started>15: sys.exit(2)
+ time.sleep(0.02)
+os.execvp('python3', ['python3', *sys.argv[1:]])
+`, { mode: 0o755 });
+  let application: Awaited<ReturnType<typeof electron.launch>> | undefined;
+  let traced = false;
+  let completed = false;
   try {
-    const page = await application.firstWindow();
-    await expect(page.getByRole('button', { name: 'Mapeamento', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Perfis', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Seu fluxo, sempre à mão.' })).toBeVisible();
-    expect(await page.locator('.brand-mark img').evaluate(image => (image as HTMLImageElement).naturalWidth)).toBe(256);
-    await writeFile(gate, 'ready');
-    const status = await page.evaluate(() => window.littleTecDesktop!.request({ operation: 'status' }));
-    expect(status.body.bridge).toBe(true);
+    application = await test.step('iniciar Electron com a ponte suspensa', () => electron.launch({
+      args: ['.'], cwd: process.cwd(), timeout: 10_000,
+      env: { ...process.env, LITTLETEC_TEST_USER_DATA: profile, LITTLETEC_DISABLE_AUTO_CONNECT: '1', LITTLETEC_PYTHON: python },
+    }));
+    await application.context().tracing.start({ screenshots: true, snapshots: true, sources: true });
+    traced = true;
+    const page = await application.firstWindow({ timeout: 10_000 });
+    await test.step('editar a interface antes da prontidão da ponte', async () => {
+      await expect(page.getByRole('button', { name: 'Mapeamento', exact: true })).toBeVisible({ timeout: 5_000 });
+      await page.getByRole('button', { name: 'Perfis', exact: true }).click({ timeout: 5_000 });
+      await expect(page.getByRole('heading', { name: 'Seu fluxo, sempre à mão.' })).toBeVisible({ timeout: 5_000 });
+      await expect.poll(() => page.locator('.brand-mark img').evaluate(image => (image as HTMLImageElement).naturalWidth)).toBe(256);
+    });
+    await test.step('liberar a ponte e conferir o transporte', async () => {
+      await writeFile(gate, 'ready');
+      const status = await page.evaluate(() => window.littleTecDesktop!.request({ operation: 'status' }));
+      expect(status.body.bridge).toBe(true);
+    });
+    completed = true;
   } finally {
     await writeFile(gate, 'ready');
-    await application.close();
+    if (application) {
+      if (traced) await application.context().tracing.stop(completed ? {} : { path: testInfo.outputPath('startup-trace.zip') });
+      await application.close();
+    }
     await rm(profile, { recursive: true, force: true });
   }
 });

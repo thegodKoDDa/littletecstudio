@@ -59,6 +59,14 @@ jobs:
       - name: Verificar fluxos Electron sem USB
         run: xvfb-run -a npm run test:desktop:ui
 
+      - name: Guardar diagnóstico de falhas gráficas
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostico-interface
+          path: test-results/
+          retention-days: 7
+
   desktop:
     name: Pacote Desktop · Windows x64
     runs-on: windows-2025

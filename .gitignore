@@ -13,3 +13,15 @@ __pycache__/
 .venv/
 venv/
 *.log
+
+# Desktop Electron e Python Windows
+dist-electron/
+release/
+build/
+.venv-windows/
+bridge/core/captures/
+LittleTec-Desktop.exe
+
+# Histórico local transferido e dados privados
+.local/
+LittleTec-Studio.exe

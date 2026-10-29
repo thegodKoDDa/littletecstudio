@@ -1,76 +1,48 @@
-# Estado atual — LittleTec Web 0.2.0
+# Estado atual — LittleTec Studio 0.3.0
 
 Atualizado em **29/10/2026**.
 
-## Confirmação de funcionamento
+## Produto ativo
 
-O usuário confirmou que **desktop e, principalmente, Web estão funcionando
-normalmente: mapeando, trocando cores e aplicando mudanças no teclado**.
-O Web local com ponte Windows tem uso real confirmado. Não retomar integração,
-escrita dos giratórios ou iluminação como funcionalidades ainda por concluir.
-Não repetir ensaios físicos por rotina.
+O antigo repositório `littletec-web` passou a **littletecstudio**. Web e Desktop
+Electron usam a mesma interface React e os mesmos serviços Python. A pasta
+local é `littletec-studio`; o repositório Qt foi preservado como `littletec-og`,
+com desenvolvimento encerrado.
 
-Essa confirmação é de uso, não um novo laudo automatizado de cada efeito,
-combinação, camada ou persistência após reconexão. Os laudos históricos preservam
-seu alcance. LED continua sem readback; último envio e prévia local não são
-leitura do estado interno.
+- [Web online](https://thegodkodda.github.io/littletecstudio/): editor de perfis.
+- [Releases](https://github.com/thegodKoDDa/littletecstudio/releases): Desktop
+  Windows, editor Web portátil e verificadores SHA-256.
+- Entrada desktop local: `LittleTec-Studio.exe`, na raiz, com pacote embutido e
+  preparação automática para disco Windows, inclusive ao abrir pelo WSL.
+- USB no Web local usa Python Windows e relay WSL. Pages/HTML não incluem a ponte.
 
-## Versões e publicação
+## Confirmações e limites
 
-| Produto | Versão publicada | Commit da versão | Main consultada em 29/10/2026 |
-| --- | --- | --- | --- |
-| Web | `v0.2.0` | `256e0ce` | `7f0bb11` |
-| Studio desktop | `v1.1.0` | `f234995` | `eaa6f36` |
+O usuário confirmou mapeamento, cores e aplicação no Web 0.2.0 e no desktop Qt
+1.1.0. O novo Desktop abriu para o usuário; o erro de fechar/reabrir foi corrigido.
+Essas confirmações não são ensaios individuais de todos os efeitos, combinações
+ou persistência após reconexão. Os relatórios da construção e do encerramento
+estão no [histórico](historico/README.md).
 
-[Repositório Web](https://github.com/thegodKoDDa/littletec-web),
-[release Web](https://github.com/thegodKoDDa/littletec-web/releases/tag/v0.2.0),
-[Pages](https://thegodkodda.github.io/littletec-web/) e
-[desktop](https://github.com/thegodKoDDa/littletec).
-CI das duas main consultadas, release Web e deploy Pages concluíram com sucesso.
-Pages respondeu HTTP 200 na consulta de 29/10/2026. Commits posteriores às tags
-atualizam a documentação de convergência; não são novas versões do produto.
+A reorganização mantém protocolo, perfis v1/v2, dados opacos e reservados, limites
+dos registros, fila serial e revisão do snapshot. Entrada MI_01 é passiva e
+mantém ambiguidades. LED permanece sem readback conhecido.
 
-## Formas de execução
+Não iniciar leitura, escrita, monitoramento ou novos ensaios físicos por rotina.
+As verificações da reorganização usam testes puros, simulação, build e smoke
+sem USB. Resultados estão em [REORGANIZACAO_20261029.md](REORGANIZACAO_20261029.md).
 
-| Forma | Capacidades |
-| --- | --- |
-| Web local com ponte Python Windows | Ler teclado, editar e aplicar mapeamento/cores; entrada física ao vivo |
-| GitHub Pages | Editor, rascunhos e importação/exportação de perfis; sem ponte USB incluída |
-| Pacote HTML estático | Editor de perfis; sem ponte USB incluída |
+## Organização
 
-A confirmação de uso USB se refere à integração local, não a acesso direto ao
-hardware pelo Pages. Não há transporte WebHID implementado.
+Código ativo em `src/`, `desktop/`, `bridge/` e `tools/`. O núcleo Python é
+`bridge/core/littletec/`, sem dependência de fontes ou ambiente do OG.
+A antiga cópia `littletec/web/` foi transferida integralmente, exceto caches
+regeneráveis, para `.local/legado/web-interno-20261029/`. Capturas `.runtime` e
+resultados dessa cópia foram preservados. O histórico original de Git permanece.
 
-## Código, cópias e evidências
+A biblioteca desktop conserva o caminho `%APPDATA%/LittleTec Desktop` e as
+chaves anteriores para manter os rascunhos existentes. Esse nome interno é uma
+compatibilidade de dados; o produto apresentado ao usuário é LittleTec Studio.
 
-- `src/components/`: Studio, editor, placa, giratórios e painel ao vivo.
-- `src/lib/`: perfil v1/v2, catálogo, transporte e estado de entrada ao vivo.
-- `src/app/api/device/route.ts`: API local de comandos de alto nível.
-- `bridge/server.py`: serialização, revisão do snapshot e coordenação dos serviços.
-- `bridge/relay.py`: transporte pelo loopback Windows a partir do WSL.
-- `bridge/input_events.py`, `live_input.py`, `raw_input_windows.py`: monitor passivo
-  MI_01 e associação ao mapeamento lido; configuração usa MI_00 por HIDAPI.
-- No repositório independente, `bridge/core/littletec/` inclui o núcleo Python.
-  A cópia interna em `littletec/web/` importa o núcleo do desktop em `../novo/src/`.
-- As duas cópias não se sincronizam automaticamente; lançadores, documentação e
-  artefatos podem diferir. Em 29/10/2026, os 14 módulos do núcleo incluído coincidiam
-  com os correspondentes do desktop.
-- Capturas de desenvolvimento ficam em `littletec/web/.runtime/`, fora do Git.
-  Sua ausência em um clone público não significa ausência de validação anterior.
-
-## Alcance das verificações
-
-A documentação da 0.2 registra 14 testes TypeScript, 28 Python e 9 Playwright,
-build/tipos, leitura USB real e eventos físicos dos knobs/teclas. São resultados
-daquela sessão; não foram reexecutados para organizar estes documentos.
-A confirmação atual de uso acrescenta troca de cores e aplicação de alterações.
-Detalhes em [VERIFICACAO.md](VERIFICACAO.md).
-
-Modelos diferentes do 12+2 são rascunhos. Perfis opacos e reservados permanecem
-preservados; cópias cobrem 72 relatórios, sem firmware nem estado LED interno.
-O monitor não informa diretamente origem física, camada ativa ou ângulo absoluto;
-associação ao snapshot mantém ambiguidades de comandos repetidos.
-
-O Web é a referência registrada para futura convergência visual do desktop.
-Essa direção não significa migração concluída nem tarefa iniciada nesta revisão.
-Documentação em [README.md](README.md) e uso em [../README.md](../README.md).
+O OG conserva o Qt 1.1.0, executável e `_internal`, fontes, testes, originais e
+capturas. O novo Studio não altera seu aplicativo. Ver [OG](https://github.com/thegodKoDDa/littletec-og).

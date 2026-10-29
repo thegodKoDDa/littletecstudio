@@ -1,0 +1,3 @@
+# Ambiente exclusivo do produto Web + Electron, sem Qt.
+hidapi==0.15.0
+PyInstaller==6.22.3

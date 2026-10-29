@@ -1,31 +1,46 @@
 {
-  "name": "littletec-web",
-  "version": "0.2.0",
+  "name": "littletecstudio",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "node tools/run-local.mjs dev",
     "dev:ui": "next dev --hostname 127.0.0.1",
     "build": "next build",
     "build:static": "STATIC_EXPORT=true next build",
-    "build:pages": "STATIC_EXPORT=true BASE_PATH=/littletec-web next build",
+    "build:pages": "STATIC_EXPORT=true BASE_PATH=/littletecstudio next build",
     "start": "node tools/run-local.mjs start",
     "start:ui": "next start --hostname 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "desktop:build": "node tools/build-desktop.mjs",
+    "desktop:dev": "npm run desktop:build && electron .",
+    "desktop:pack": "node tools/package-desktop.mjs",
+    "desktop:smoke": "electron . --smoke",
+    "test:desktop": "tsx --test tests/desktop*.test.ts",
+    "test:desktop:ui": "playwright test --config playwright.desktop.config.ts",
+    "web:pack": "node tools/package-web.mjs",
+    "test:web:portable": "playwright test --config playwright.portable.config.ts"
   },
   "dependencies": {
+    "lucide-react": "^0.468.0",
     "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "lucide-react": "^0.468.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.0",
+    "@playwright/test": "^1.56.0",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
     "tsx": "^4.20.0",
-    "@playwright/test": "^1.56.0"
-  }
+    "typescript": "^5.9.0"
+  },
+  "main": "dist-electron/main.cjs",
+  "description": "LittleTec Studio — Web e Desktop Windows com uma base compartilhada",
+  "author": "LittleTec",
+  "license": "ISC"
 }

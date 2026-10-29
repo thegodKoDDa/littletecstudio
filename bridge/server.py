@@ -18,10 +18,7 @@ from threading import Lock
 
 WEB_ROOT = Path(__file__).resolve().parents[1]
 core_dir = Path(__file__).resolve().parent / "core"
-if core_dir.exists():
-    sys.path.insert(0, str(core_dir))
-else:
-    sys.path.insert(0, str(WEB_ROOT.parent / 'novo' / 'src'))
+sys.path.insert(0, str(core_dir))
 
 from littletec.configuration_service import ConfigurationService
 from littletec.profile import validate

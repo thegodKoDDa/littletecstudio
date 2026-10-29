@@ -30,11 +30,69 @@ jobs:
       - name: Executar testes automatizados
         run: npm test
 
+      - name: Testar ponte e núcleo Python sem hardware
+        run: python3 -m unittest discover -s bridge -q
+
       - name: Verificar tipagem TypeScript
         run: npm run typecheck
+
+      - name: Preparar Chromium para testes Web
+        run: npx playwright install --with-deps chromium
+
+      - name: Testar Web local sem hardware
+        run: npx playwright test
+
+      - name: Gerar e testar editor portátil
+        run: |
+          npm run web:pack
+          npx playwright test --config playwright.portable.config.ts
 
       - name: Compilar exportação estática local
         run: npm run build:static
 
       - name: Compilar exportação para GitHub Pages
         run: npm run build:pages
+
+      - name: Compilar interface compartilhada e Electron
+        run: npm run desktop:build
+
+      - name: Verificar fluxos Electron sem USB
+        run: xvfb-run -a npm run test:desktop:ui
+
+  desktop:
+    name: Pacote Desktop · Windows x64
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - name: Preparar ambiente Python exclusivo do novo produto
+        run: |
+          python -m venv .venv-windows
+          .venv-windows/Scripts/python.exe -m pip install -r requirements/windows-desktop.txt
+      - name: Gerar pacote sem publicar
+        run: npm run desktop:pack
+      - name: Smoke Windows sem USB
+        shell: pwsh
+        run: |
+          $env:LITTLETEC_SMOKE_REPORT = "$env:RUNNER_TEMP\littletec-smoke.json"
+          $desktopProcess = Start-Process -FilePath ".\LittleTec-Studio.exe" -ArgumentList "--smoke", "--smoke-close-window" -PassThru
+          if (-not $desktopProcess.WaitForExit(120000)) { throw 'Smoke excedeu o prazo.' }
+          $report = Get-Content $env:LITTLETEC_SMOKE_REPORT -Raw | ConvertFrom-Json
+          if (-not $report.bridge -or -not $report.packaged -or $report.connected) { throw 'Smoke incompleto.' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LittleTec-Studio-Windows-x64
+          path: |
+            release/LittleTec-Studio-*.zip
+            release/LittleTec-Studio.exe
+            release/SHA256SUMS-desktop.txt

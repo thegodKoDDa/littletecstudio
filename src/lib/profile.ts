@@ -261,6 +261,11 @@ export function textAction(text: string, enter = false): Action {
   return { type: "keyboard", steps };
 }
 export function download(value: unknown, name: string) {
+  if (typeof window !== 'undefined' && window.littleTecDesktop) {
+    // O processo principal apresenta o diálogo nativo e trata falhas de disco.
+    void window.littleTecDesktop.saveJson(value, name);
+    return;
+  }
   const url = URL.createObjectURL(
     new Blob([JSON.stringify(value, null, 2)], { type: "application/json" }),
   );

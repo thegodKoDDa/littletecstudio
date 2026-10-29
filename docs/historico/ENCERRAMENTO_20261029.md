@@ -40,7 +40,7 @@ continuam locais, fora dos commits.
 
 ## Próxima retomada
 
-Começar por [ESTADO_ATUAL.md](ESTADO_ATUAL.md) e pelo [índice](README.md).
+Começar por [ESTADO_ATUAL.md](../ESTADO_ATUAL.md) e pelo [índice](../README.md).
 Nenhuma nova alteração de produto foi iniciada ou ficou pela metade. O próximo
 trabalho depende da mudança que o usuário escolher.
 

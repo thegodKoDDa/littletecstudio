@@ -117,6 +117,7 @@ export function Studio() {
   );
   const hasDraft = useRef(false);
   const [ready, setReady] = useState(false);
+  const isDesktop = ready && typeof window !== "undefined" && !!window.littleTecDesktop;
   const [review, setReview] = useState(false);
   const [help, setHelp] = useState(false);
   const [diagnostic, setDiagnostic] = useState<unknown>(null);
@@ -547,18 +548,18 @@ export function Studio() {
     ];
     if (!persistLibrary(list)) return;
     setFileSaved(JSON.stringify(profile));
-    setNotice({ text: "Perfil salvo neste navegador." });
+    setNotice({ text: isDesktop ? "Perfil salvo na biblioteca." : "Perfil salvo neste navegador." });
   }
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <a className="brand" href="/" aria-label="LittleTec início">
+        <a className="brand" href="#" onClick={() => setPage("Mapeamento")} aria-label="LittleTec Studio início">
           <span className="brand-mark">
             <Command size={21} />
           </span>
           <span>
             little<span>tec</span>
-            <small>STUDIO / WEB</small>
+            <small>STUDIO / {isDesktop ? "DESKTOP" : "WEB"}</small>
           </span>
         </a>
         <div className="workspace-label">
@@ -615,7 +616,7 @@ export function Studio() {
             </span>
             <strong>Seu teclado. Seus dados.</strong>
             <p>
-              Rascunhos salvos neste navegador.
+              Rascunhos salvos {isDesktop ? "neste aplicativo" : "neste navegador"}.
               <br />
               Sem conta, sem nuvem.
             </p>
@@ -641,8 +642,8 @@ export function Studio() {
             {theme === "dark" ? "claro" : "escuro"}
           </button>
           <div className="sidebar-footer">
-            <span>LittleTec Web</span>
-            <span>0.2 / LIVE</span>
+            <span>LittleTec Studio</span>
+            <span>{isDesktop ? "DESKTOP / LOCAL" : "WEB / LOCAL"}</span>
           </div>
         </div>
       </aside>
@@ -683,7 +684,7 @@ export function Studio() {
             <div>
               <div className="eyebrow title-eyebrow">
                 <span />
-                LITTLETEC STUDIO <span className="web-tag">WEB EDITION</span>
+                LITTLETEC STUDIO <span className="web-tag">{isDesktop ? "DESKTOP EDITION" : "WEB EDITION"}</span>
               </div>
               <h1>{pageInfo[page].title}</h1>
               <p>{pageInfo[page].description}</p>
@@ -1196,7 +1197,7 @@ export function Studio() {
                 <span>
                   <FolderOpen size={16} /> SUA BIBLIOTECA
                 </span>
-                <span>{savedProfiles.length} perfis neste navegador</span>
+                <span>{savedProfiles.length} perfis {isDesktop ? "neste aplicativo" : "neste navegador"}</span>
               </div>
               <div className="profile-cards">
                 <button
@@ -1367,7 +1368,7 @@ export function Studio() {
                   </button>
                   <button className="button primary" onClick={saveInBrowser}>
                     <Save size={16} />
-                    Salvar neste navegador
+                    {isDesktop ? "Salvar na biblioteca" : "Salvar neste navegador"}
                   </button>
                 </div>
               </div>

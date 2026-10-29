@@ -22,6 +22,15 @@ export async function deviceRequest(
   signal?: AbortSignal,
 ): Promise<DeviceResult> {
   try {
+    if (typeof window !== "undefined" && window.littleTecDesktop) {
+      signal?.throwIfAborted();
+      const reply = await window.littleTecDesktop.request({ operation, ...payload });
+      signal?.throwIfAborted();
+      if (reply.status !== 200) {
+        throw new Error(typeof reply.body.error === "string" ? reply.body.error : "Não foi possível concluir a operação.");
+      }
+      return reply.body as DeviceResult;
+    }
     const response = await fetch("/api/device", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -8,7 +8,7 @@ A tabela descreve funcionalidades implementadas. A confirmação de uso não é 
 ensaio individual de cada item. A sessão anterior verificou leitura e aplicação
 sem mudanças; esse limite histórico não restringe a confirmação posterior do
 usuário. Estado em [ESTADO_ATUAL.md](ESTADO_ATUAL.md) e resultados por sessão em
-[VERIFICACAO.md](VERIFICACAO.md).
+[VERIFICACAO.md](historico/VERIFICACAO.md).
 
 | Recurso | Destino / comportamento na web |
 | --- | --- |

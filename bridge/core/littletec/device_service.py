@@ -16,6 +16,8 @@ ROOT = Path(sys._MEIPASS) if getattr(sys, 'frozen', False) else Path(__file__).r
 
 
 def capture_directory():
+    if os.environ.get('LITTLETEC_CAPTURE_ROOT'):
+        return Path(os.environ['LITTLETEC_CAPTURE_ROOT'])
     if getattr(sys, 'frozen', False):
         return Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'LittleTec' / 'captures'
     return ROOT / 'captures'

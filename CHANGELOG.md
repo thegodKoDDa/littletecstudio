@@ -1,5 +1,18 @@
 # LittleTec Web
 
+## 0.3.0 — 29/10/2026
+
+- Projeto unificado como LittleTec Studio; Web e Desktop no repositório `littletecstudio`.
+- Desktop Electron com a interface React do Web e núcleo Python comum.
+- Executável portátil com pacote embutido e abertura direta pelo WSL/Windows.
+- Correção do fechamento da janela e da reabertura; integração nativa de arquivos.
+- Organização da documentação, releases Windows/Web e vínculo com o OG preservado.
+- Transferência da cópia Web interna e suas evidências para o histórico local do Studio.
+- Perfis, chaves de armazenamento e dados anteriores preservados.
+
+As versões abaixo pertencem ao histórico Web anterior.
+
+
 ## 0.2.0 — 28/10/2026
 
 - Entrada ao vivo por Windows Raw Input: teclado, mídia e mouse do LittleTec,

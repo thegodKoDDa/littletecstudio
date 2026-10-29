@@ -8,16 +8,21 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# LittleTec Web — orientações vigentes em 29/10/2026
+# LittleTec Studio — orientações vigentes em 29/10/2026
 
-- Web 0.2.0 e Studio desktop 1.1.0 funcionam em uso real para mapeamento,
-  cores e aplicação, conforme o usuário. Não retomar a integração como pendente.
-- Começar por `docs/ESTADO_ATUAL.md` e `docs/README.md`.
-- USB usa ponte Python Windows; Pages/HTML estático oferecem edição de perfis.
+- Repositório ativo: `thegodKoDDa/littletecstudio`, pasta `littletec-studio`.
+- Ler `RETOMAR.md`, `docs/ESTADO_ATUAL.md` e `docs/README.md`.
+- Web e Desktop Electron compartilham a interface `src/` e o núcleo Python `bridge/core/`.
+- `../littletec-og` é arquivo Qt 1.1.0 preservado, sem desenvolvimento. Não alterar seus binários.
+- A cópia Web anterior e evidências estão em `.local/legado/web-interno-20261029/`.
+- Executável público: `LittleTec-Studio.exe`, com pacote embutido; fontes e build em `desktop/` e `tools/`.
 - Preservar protocolo, perfis v1/v2, opacos, reservados e evidências locais.
-- Manter I/O na ponte, operações seriais e revisão de snapshot entre abas.
-- LED não tem readback; distinguir último envio de seleção local.
-- Monitor MI_01 é passivo e associa eventos ao snapshot; preservar ambiguidades.
-- Não repetir ensaios físicos nem iniciar monitor/USB em testes ou build por rotina.
-- Cópia interna e repositório Web independente não se sincronizam automaticamente.
-- Documentar em português. Não criar commits, releases ou publicar sem pedido específico.
+- Nenhum protocolo USB em React; I/O serial na ponte e revisão de snapshot entre sessões.
+- LED não tem readback: distinguir seleção local e último envio. Monitor MI_01 é passivo e preserva ambiguidades.
+- Python Windows próprio em `.venv-windows`, relay para Web no WSL; não depender do OG.
+- Não iniciar USB ou monitor em build/smoke. Testes físicos são opt-in, sem repetições de rotina.
+- Manter as chaves e caminhos de perfis anteriores; mudança de nome não pode apagar rascunhos.
+- `.local/`, `.runtime/`, ambientes e capturas não são material público. Nunca publicar tokens.
+- Conversar e documentar em português. Commits/publicações exigem pedido específico;
+  a reorganização e publicação de 29/10/2026 foram explicitamente autorizadas pelo usuário.
+- Não copiar mudanças manualmente entre duas interfaces. Gerar Web e Desktop da mesma base.

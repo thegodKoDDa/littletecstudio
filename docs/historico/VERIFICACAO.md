@@ -7,7 +7,7 @@ troca de cores e aplicação de mudanças, conforme confirmação do usuário. O
 local com ponte não se limita à leitura ou à aplicação sem alterações.
 
 Web 0.2.0 publicado em release e GitHub Pages; desktop 1.1.0 publicado em seu
-repositório. Estado, commits e formas de execução em [ESTADO_ATUAL.md](ESTADO_ATUAL.md).
+repositório. Estado, commits e formas de execução em [ESTADO_ATUAL.md](../ESTADO_ATUAL.md).
 A confirmação de uso não é leitura interna do LED nem ensaio específico de
 persistência ou de cada efeito. Não repetir ensaios por rotina.
 
@@ -44,7 +44,7 @@ Não houve novo envio de configuração, ensaio de cores ou A/F24. Mouse tem
 interpretação e registro de coleção, cobertos por testes simulados; não foi
 reconfigurado o teclado para produzir novas ações de mouse neste ensaio.
 
-Uso e limites: [ENTRADA_AO_VIVO.md](ENTRADA_AO_VIVO.md).
+Uso e limites: [ENTRADA_AO_VIVO.md](../ENTRADA_AO_VIVO.md).
 
 ---
 

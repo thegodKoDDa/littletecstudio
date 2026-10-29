@@ -1,46 +1,46 @@
-name: Release Web Portátil
-
+name: Publicar LittleTec Studio
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
   workflow_dispatch:
-
 permissions:
   contents: write
-
 jobs:
   release:
-    name: Gerar Pacote HTML Portátil
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    name: Web e Desktop Windows
+    runs-on: windows-2025
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Instalar dependências
-        run: npm ci
-
-      - name: Compilar exportação estática
-        run: npm run build:static
-
-      - name: Compactar pacote estático
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - name: Preparar Python Windows
         run: |
-          cd out
-          zip -r ../LittleTec-Web-Standalone.zip ./*
-          cd ..
-          sha256sum LittleTec-Web-Standalone.zip > SHA256SUMS.txt
-
-      - name: Criar Release no GitHub
-        uses: softprops/action-gh-release@v2
+          python -m venv .venv-windows
+          .venv-windows/Scripts/python.exe -m pip install -r requirements/windows-desktop.txt
+      - run: npm run web:pack
+      - run: npm run desktop:pack
+      - name: Conferir executável único sem USB
+        shell: pwsh
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/smoke-windows.ps1 -CloseWindow
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LittleTec-Studio
+          path: |
+            release/LittleTec-Studio.exe
+            release/LittleTec-Studio-*.zip
+            release/SHA256SUMS-*.txt
+      - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            LittleTec-Web-Standalone.zip
-            SHA256SUMS.txt
+            release/LittleTec-Studio.exe
+            release/LittleTec-Studio-*.zip
+            release/SHA256SUMS-*.txt
           generate_release_notes: true

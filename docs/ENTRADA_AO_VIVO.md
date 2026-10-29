@@ -1,5 +1,9 @@
 # Entrada ao vivo — LittleTec Web 0.2
 
+Estado vigente em [ESTADO_ATUAL.md](ESTADO_ATUAL.md). O usuário confirmou o Web
+funcional para mapeamento, cores e aplicação em 29/10/2026. Os números e os casos
+concretos na seção Verificação abaixo são do ensaio de 28/10/2026.
+
 Conecte o teclado pela interface. A entrada ao vivo inicia automaticamente e pode
 ser pausada no painel acima do aparelho. Não grava configuração e não bloqueia
 as teclas, atalhos, volume ou brilho no Windows. “Seguir entrada” muda a seleção
@@ -38,7 +42,7 @@ ou o ângulo físico. Por isso:
   não é necessário inventar qual camada está ativa.
 - Se a ação aparece em posições diferentes, os candidatos são destacados em
   âmbar. Nenhum sentido de giro é inventado nesse caso.
-- Um exemplo real é Silenciar: na configuração lida, está na tecla 1 e no clique
+- Um exemplo real é Silenciar: na configuração lida durante aquele ensaio, estava na tecla 1 e no clique
   do giro 1. O relatório de mídia é igual e não distingue essas origens.
 - Ações vazias e atraso sem saída não geram um evento observável. Monitorá-las
   como se fossem teclas identificadas exigiria informação que não existe no fluxo.

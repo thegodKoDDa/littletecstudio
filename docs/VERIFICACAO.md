@@ -1,4 +1,23 @@
-# Verificação vigente — Web 0.2, 28/10/2026
+# Verificação e funcionamento — LittleTec Web
+
+## Estado vigente — 29/10/2026
+
+**Desktop 1.1.0 e Web 0.2.0 estão funcionando em uso real**, incluindo mapeamento,
+troca de cores e aplicação de mudanças, conforme confirmação do usuário. O Web
+local com ponte não se limita à leitura ou à aplicação sem alterações.
+
+Web 0.2.0 publicado em release e GitHub Pages; desktop 1.1.0 publicado em seu
+repositório. Estado, commits e formas de execução em [ESTADO_ATUAL.md](ESTADO_ATUAL.md).
+A confirmação de uso não é leitura interna do LED nem ensaio específico de
+persistência ou de cada efeito. Não repetir ensaios por rotina.
+
+Esta atualização é documental: não executou testes, build, monitoramento ou I/O
+USB. As contagens e observações a seguir pertencem às sessões originais. Frases
+como “não houve envio” ou “não publicado” são registros históricos dessas sessões.
+
+---
+
+## Histórico — verificação Web 0.2 em 28/10/2026
 
 Implementado monitor passivo Windows Raw Input em thread própria, sem escrever
 configuração nem bloquear os comandos do Windows. Quatro coleções de entrada
@@ -29,14 +48,12 @@ Uso e limites: [ENTRADA_AO_VIVO.md](ENTRADA_AO_VIVO.md).
 
 ---
 
-## Histórico da verificação 0.1
-
-# Verificação — 28/10/2026
+## Histórico — verificação Web 0.1 em 28/10/2026
 
 LittleTec Web 0.1.0, Next.js 16.4.3 / React 19.3.1 / TypeScript.
 Implementação local em web/, sem mudanças no Studio Windows 1.1 ou nos originais.
 
-## Conectividade real corrigida
+### Conectividade real corrigida
 
 A aplicação Next estava no WSL/NAT e a ponte Windows não estava iniciada.
 O loopback WSL não alcançava o loopback Windows. O transporte agora escolhe
@@ -70,7 +87,7 @@ Não repetir ensaios antigos de A/F24, slots de giros ou ciano/vermelho.
 Escritas com mudanças continuam usando o serviço validado do Studio, com
 regressões simuladas; não alegar novo ensaio físico de troca de cor/mapeamento.
 
-## Regressões de software
+### Regressões de software
 
 - Compilação de produção Next passou; verificações TypeScript passaram,
   incluindo ausência de imports e parâmetros não usados.
@@ -88,5 +105,7 @@ regressões simuladas; não alegar novo ensaio físico de troca de cor/mapeament
 Esses testes usam serviços/respostas simulados para envios. O Playwright inicia
 somente `dev:ui` se precisar de servidor; nunca inicia a ponte USB por rotina.
 
-A distribuição web não foi publicada; não houve commits nem push nesta etapa.
+Ao fim daquela etapa 0.1, a distribuição Web ainda não havia sido publicada
+e não houve commits nem push naquela sessão. A publicação posterior da 0.2.0
+está registrada no estado vigente acima.
 O desktop continua com cores e mapeamento funcionando, conforme o usuário.

@@ -1,10 +1,14 @@
 # Paridade da aplicação web
 
-Comparação com os 30 itens do inventário do Studio. “Implementado” descreve
-código acessível e integração de software; **não equivale a teste físico pela web**.
-O desktop 1.1 permanece confirmado pelo usuário para cores e mapeamento.
-A leitura real pela web e a aplicação sem alterações foram verificadas em
-28/10/2026; não houve novo ensaio físico de troca de configuração.
+Atualizado em **29/10/2026**. Comparação com os 30 itens do inventário do Studio.
+**Desktop 1.1.0 e Web 0.2.0 têm uso real confirmado pelo usuário para mapeamento,
+cores e aplicação de alterações**, com destaque para o Web.
+
+A tabela descreve funcionalidades implementadas. A confirmação de uso não é um
+ensaio individual de cada item. A sessão anterior verificou leitura e aplicação
+sem mudanças; esse limite histórico não restringe a confirmação posterior do
+usuário. Estado em [ESTADO_ATUAL.md](ESTADO_ATUAL.md) e resultados por sessão em
+[VERIFICACAO.md](VERIFICACAO.md).
 
 | Recurso | Destino / comportamento na web |
 | --- | --- |

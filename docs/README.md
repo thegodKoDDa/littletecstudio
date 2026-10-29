@@ -1,5 +1,7 @@
 # Documentação do LittleTec Web
 
+[Encerramento de 29/10/2026](ENCERRAMENTO_20261029.md): resultados finais e ponto de retomada.
+
 Atualizada em **29/10/2026**.
 
 - [Estado atual, confirmação do usuário, versões e publicação](ESTADO_ATUAL.md).

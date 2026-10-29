@@ -2,6 +2,9 @@
 
 Atualizado em **29/10/2026**.
 
+Sessão encerrada após a [conferência da release 0.4.0](ENCERRAMENTO_20261029_STUDIO_040.md):
+arquivos publicados íntegros, CI aprovada e 68 testes locais passando.
+
 ## Produto ativo
 
 O antigo repositório `littletec-web` passou a **littletecstudio**. Web e Desktop

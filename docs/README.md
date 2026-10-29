@@ -1,6 +1,7 @@
 # Documentação — LittleTec Studio
 
 - [Estado atual e versões](ESTADO_ATUAL.md).
+- [Encerramento e conferência da release 0.4.0](ENCERRAMENTO_20261029_STUDIO_040.md).
 - [Ícone, abertura e conexão automática na 0.4.0](OTIMIZACAO_0.4.0.md).
 - [Uso, formatos e comandos](../README.md).
 - [Desktop, arquitetura compartilhada e build](DESKTOP.md).

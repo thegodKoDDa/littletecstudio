@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+.runtime/
+.env*
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.zip
+SHA256SUMS.txt
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log

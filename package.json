@@ -1,0 +1,31 @@
+{
+  "name": "littletec-web",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "node tools/run-local.mjs dev",
+    "dev:ui": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "build:static": "STATIC_EXPORT=true next build",
+    "build:pages": "STATIC_EXPORT=true BASE_PATH=/littletec-web next build",
+    "start": "node tools/run-local.mjs start",
+    "start:ui": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "lucide-react": "^0.468.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.20.0",
+    "@playwright/test": "^1.56.0"
+  }
+}

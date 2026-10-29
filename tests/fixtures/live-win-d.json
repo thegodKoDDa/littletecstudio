@@ -1,0 +1,12 @@
+{
+  "source": "Windows Raw Input, 1189:8842 MI_01, clique real do knob 2 em 28/10/2026. Payload RAWKEYBOARD; não são pacotes USB de configuração.",
+  "packets": [
+    {"after_ms": 0, "data_hex": "5b00020000005b000001000000000000"},
+    {"after_ms": 162, "data_hex": "5b00030000005b000101000000000000"},
+    {"after_ms": 167, "data_hex": "20000100000044000101000000000000"},
+    {"after_ms": 510, "data_hex": "5b00020000005b000001000000000000"},
+    {"after_ms": 648, "data_hex": "5b00030000005b000101000000000000"},
+    {"after_ms": 653, "data_hex": "20000100000044000101000000000000"}
+  ],
+  "expected_action": {"type": "keyboard", "steps": [{"key": "D", "modifiers": ["Win"]}]}
+}

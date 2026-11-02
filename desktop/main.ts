@@ -146,6 +146,17 @@ else {
       }
     });
 
+    ipcMain.handle('desktop:open-external', async (event, url: unknown) => {
+      if (event.sender !== window?.webContents || !event.senderFrame?.url.startsWith(origin + '/')) {
+        throw new Error('Origem não autorizada.');
+      }
+      if (typeof url !== 'string' || (!url.startsWith('https://') && !url.startsWith('http://'))) {
+        throw new Error('URL inválida.');
+      }
+      await shell.openExternal(url);
+      return true;
+    });
+
     window = new BrowserWindow({
       width: 1440, height: 1000, minWidth: 900, minHeight: 650,
       title: 'LittleTec Studio', backgroundColor: '#111412', show: false,

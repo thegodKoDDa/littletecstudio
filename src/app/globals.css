@@ -410,6 +410,110 @@ h3 {
   width: 1px;
   background: var(--border);
 }
+.lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  background: var(--panel-2, #1d2123);
+  border: 1px solid var(--border, #313639);
+  border-radius: 8px;
+  padding: 2px 4px;
+  gap: 2px;
+}
+.lang-switcher .lang-icon {
+  color: var(--muted, #858b8e);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+.lang-switcher button {
+  background: transparent;
+  border: none;
+  color: var(--muted, #858b8e);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+.lang-switcher button:hover {
+  color: var(--text, #f0f2f3);
+  background: rgba(255, 255, 255, 0.05);
+}
+.lang-switcher button.active {
+  background: var(--accent, #c2f970);
+  color: #121c0b;
+  font-weight: 700;
+}
+.platform-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 7px;
+  cursor: pointer;
+  background: #1e261b;
+  border: 1px solid #3d4a36;
+  color: #c2f970;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.platform-action-btn:hover {
+  background: #2b3924;
+  border-color: #a7e94e;
+  color: #dcff97;
+  box-shadow: 0 2px 10px rgba(194, 249, 112, 0.15);
+}
+.platform-action-btn.web-btn {
+  background: #1b2228;
+  border-color: #313d46;
+  color: #8ecbff;
+}
+.platform-action-btn.web-btn:hover {
+  background: #232e38;
+  border-color: #4da6ff;
+  color: #bde1ff;
+  box-shadow: 0 2px 10px rgba(77, 166, 255, 0.15);
+}
+.download-card-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--panel-2, #181d1a);
+  border: 1px solid var(--border, #313e33);
+  border-radius: 10px;
+  margin: 20px 0;
+}
+.download-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #222d1e;
+  border: 1px solid #3d4e34;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent, #c2f970);
+  flex-shrink: 0;
+}
+.download-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.download-card-info strong {
+  font-size: 14px;
+  color: var(--text, #fff);
+}
+.download-card-info span {
+  font-size: 12px;
+  color: var(--muted, #858b8e);
+}
 .button {
   display: inline-flex;
   justify-content: center;
@@ -2342,15 +2446,33 @@ h1 {
   }
   .topbar {
     height: 64px;
-    padding: 0 18px;
+    padding: 0 8px;
   }
   .breadcrumb {
-    gap: 9px;
+    gap: 4px;
     font-size: 10px;
+  }
+  .topbar-actions {
+    gap: 4px;
+  }
+  .platform-action-btn {
+    display: none;
+  }
+  .lang-switcher {
+    padding: 1px;
+    gap: 1px;
+  }
+  .lang-switcher .lang-icon {
+    display: none;
+  }
+  .lang-switcher button {
+    padding: 2px 4px;
+    font-size: 9px;
   }
   .button.connect {
     font-size: 9px;
-    padding: 8px 9px;
+    padding: 6px 7px;
+    gap: 5px;
   }
   .button.connect svg {
     width: 13px;

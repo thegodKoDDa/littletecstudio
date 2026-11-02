@@ -1,5 +1,17 @@
 # LittleTec Studio
 
+## 0.5.0 — 02/11/2026
+
+- Internacionalização completa (i18n): alternância instantânea entre Português (PT-BR), Inglês (EN) e Espanhol (ES) no topo da interface.
+- Campo de Testes de Teclas & Macros: tela interativa com monitor de modificadores físicos em tempo real, suporte a F13–F24, digitação de texto e histórico de eventos.
+- Gravador de Macros sequencial com cálculo preciso de atrasos e atribuição direta a qualquer tecla do macropad.
+- Modelos Prontos por Aplicativo (Presets): configurações completas de 1 clique para Photoshop, Premiere Pro, Blender, OBS Studio, VS Code e Discord.
+- Integração de transição: botão "Baixar Desktop" na versão Web com modal e download direto; botão "Acessar Web" no Desktop via Electron IPC seguro.
+- Sincronização contínua e auto-recuperação (`npm run sync` e `npm run sync:watch`), com limpeza de instâncias presas e reconstrução unificada dos pacotes.
+- Fechamento confiável ao clicar no X da janela sem deixar instâncias órfãs em segundo plano.
+- Ícones multirresolução Windows Shell com DIB nativo e máscara AND de 16 a 256px.
+- Todos os 22 testes unitários, 30 testes Python e testes E2E Playwright atualizados e validados.
+
 ## 0.4.0 — 29/10/2026
 
 - Ícone oficial único em `desktop/icon.png`, com ICO multirresolução para executáveis e ícones Web.

@@ -137,3 +137,20 @@ test("modelos populares por aplicativo geram perfis 12+2 válidos e completos", 
     assert.doesNotThrow(() => parseProfile(profile));
   }
 });
+
+test("dicionário de tradução possui paridade completa entre pt-BR, en e es", async () => {
+  const { DICTIONARY } = await import("../src/lib/i18n");
+  const ptKeys = Object.keys(DICTIONARY["pt-BR"]).sort();
+  const enKeys = Object.keys(DICTIONARY["en"]).sort();
+  const esKeys = Object.keys(DICTIONARY["es"]).sort();
+
+  assert.deepEqual(enKeys, ptKeys);
+  assert.deepEqual(esKeys, ptKeys);
+
+  // Valida que nenhuma tradução está vazia
+  for (const lang of ["pt-BR", "en", "es"] as const) {
+    for (const key of ptKeys) {
+      assert.ok(DICTIONARY[lang][key], `Chave ${key} não pode estar vazia no idioma ${lang}`);
+    }
+  }
+});

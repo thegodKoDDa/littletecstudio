@@ -72,15 +72,19 @@ export async function syncAll({ killRunning = true, smokeTest = true } = {}) {
   mkdirSync('release/win-unpacked/resources', { recursive: true });
   run('npx', ['asar', 'pack', staging, 'release/win-unpacked/resources/app.asar']);
 
+  const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
+  const desktopArchive = `LittleTec-Studio-${version}-win-x64.zip`;
+  const webArchive = `LittleTec-Studio-Web-${version}.zip`;
+
   // Atualizar zip do desktop
-  const desktopZip = path.resolve('release/LittleTec-Studio-0.4.0-win-x64.zip');
+  const desktopZip = path.resolve(path.join('release', desktopArchive));
   run('zip', ['-q', desktopZip, 'resources/app.asar'], {
     cwd: 'release/win-unpacked',
   });
 
   // Atualizar zip da versão web
   console.log('6/8 Atualizando pacote zip da versão Web portátil…');
-  const webZip = path.resolve('release/LittleTec-Studio-Web-0.4.0.zip');
+  const webZip = path.resolve(path.join('release', webArchive));
   rmSync(webZip, { force: true });
   run('zip', ['-qr', webZip, '.'], {
     cwd: 'build/web-portable',
@@ -93,19 +97,17 @@ export async function syncAll({ killRunning = true, smokeTest = true } = {}) {
     : path.resolve('.venv-windows/Scripts/python.exe'));
 
   if (existsSync(python)) {
-    run(python, ['-X', 'utf8', 'tools/build-launcher.py', '--payload', 'release/LittleTec-Studio-0.4.0-win-x64.zip']);
+    run(python, ['-X', 'utf8', 'tools/build-launcher.py', '--payload', path.join('release', desktopArchive)]);
   }
 
   // 7. Atualizar checksums SHA-256
   console.log('8/8 Calculando hashes SHA-256…');
-  const desktopArchive = 'LittleTec-Studio-0.4.0-win-x64.zip';
   const desktopLines = [desktopArchive, 'LittleTec-Studio.exe'].map(name => {
     const digest = createHash('sha256').update(readFileSync(path.join('release', name))).digest('hex');
     return `${digest}  ${name}`;
   }).join('\n') + '\n';
   writeFileSync('release/SHA256SUMS-desktop.txt', desktopLines);
 
-  const webArchive = 'LittleTec-Studio-Web-0.4.0.zip';
   const webDigest = createHash('sha256').update(readFileSync(path.join('release', webArchive))).digest('hex');
   writeFileSync('release/SHA256SUMS-web.txt', `${webDigest}  ${webArchive}\n`);
 
@@ -138,8 +140,8 @@ export async function syncAll({ killRunning = true, smokeTest = true } = {}) {
   console.log('✅ SINCRONIZAÇÃO COMPLETA: WEB E DESKTOP ATUALIZADOS!');
   console.log('   • LittleTec-Studio.exe pronto e liberado na raiz');
   console.log('   • release/win-unpacked atualizado');
-  console.log('   • release/LittleTec-Studio-0.4.0-win-x64.zip atualizado');
-  console.log('   • release/LittleTec-Studio-Web-0.4.0.zip atualizado');
+  console.log(`   • release/${desktopArchive} atualizado`);
+  console.log(`   • release/${webArchive} atualizado`);
   console.log('   • Atalhos do Windows sincronizados');
   console.log('======================================================\n');
 }

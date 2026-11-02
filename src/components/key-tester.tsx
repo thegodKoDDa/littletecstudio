@@ -97,7 +97,7 @@ export function KeyTester() {
           <Keyboard size={30} />
         </div>
         <div className="tests-hero-content">
-          <span className="eyebrow">DIAGNÓSTICO & VALIDAÇÃO EM TEMPO REAL</span>
+          <span className="eyebrow">{t("tests.eyebrow")}</span>
           <h2>{t("tests.title")}</h2>
           <p>{t("tests.desc")}</p>
         </div>
@@ -107,10 +107,10 @@ export function KeyTester() {
               type="button"
               onClick={handleClear}
               className="button secondary"
-              title="Limpar todos os registros e texto de teste"
+              title={t("tests.clear_records")}
             >
               <RotateCcw size={14} />
-              Limpar registros
+              {t("tests.clear_records")}
             </button>
           )}
         </div>
@@ -125,10 +125,10 @@ export function KeyTester() {
             <div className="test-card-header">
               <span className="test-card-title">
                 <Activity size={16} />
-                Captura de Teclas & Encoders
+                {t("tests.card_capture")}
               </span>
               <span className="test-card-badge">
-                {isFocused ? "FOCO ATIVO" : "CLIQUE P/ FOCAR"}
+                {isFocused ? t("tests.focus_active") : t("tests.click_focus")}
               </span>
             </div>
 
@@ -145,8 +145,8 @@ export function KeyTester() {
               <span className="test-capture-status">
                 <span className="status-dot" />
                 {isFocused
-                  ? "Monitorando teclas e giros do macropad…"
-                  : "Clique nesta área para focar e capturar os cliques"}
+                  ? t("tests.monitoring")
+                  : t("tests.click_area")}
               </span>
 
               <div className="test-keycap-display">
@@ -163,14 +163,14 @@ export function KeyTester() {
                   </>
                 ) : (
                   <span className="test-keycap-placeholder">
-                    Pressione qualquer tecla ou gire os encoders para validar
+                    {t("tests.placeholder")}
                   </span>
                 )}
               </div>
 
               {lastEvent && (
                 <span className="keycap-code">
-                  Código físico: <strong>{lastEvent.code}</strong> · Registrado às {lastEvent.time}
+                  {t("tests.physical_code")}: <strong>{lastEvent.code}</strong> · {t("tests.registered_at")} {lastEvent.time}
                 </span>
               )}
             </div>
@@ -178,7 +178,7 @@ export function KeyTester() {
             {/* Grid de Modificadores */}
             <div>
               <div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "8px", fontWeight: 500 }}>
-                Modificadores físicos em tempo real:
+                {t("tests.modifiers_title")}
               </div>
               <div className="test-modifiers-grid">
                 <div className={`modifier-indicator ${isCtrlActive ? "active" : ""}`}>
@@ -202,7 +202,7 @@ export function KeyTester() {
             <div className="test-card-header">
               <span className="test-card-title">
                 <Keyboard size={16} />
-                Área de Teste para Macros de Texto
+                {t("tests.typing_card")}
               </span>
               {testText && (
                 <button
@@ -211,14 +211,14 @@ export function KeyTester() {
                   className="text-button"
                   style={{ fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}
                 >
-                  <Trash2 size={12} /> Limpar texto ({testText.length} carac.)
+                  <Trash2 size={12} /> {t("tests.clear_text")} ({testText.length} {t("tests.chars")})
                 </button>
               )}
             </div>
             <textarea
               value={testText}
               onChange={(e) => setTestText(e.target.value)}
-              placeholder="Clique aqui e pressione as teclas do macropad configuradas com texto para validar a digitação contínua..."
+              placeholder={t("tests.typing_placeholder")}
               className="test-textarea"
             />
           </div>
@@ -229,19 +229,19 @@ export function KeyTester() {
           <div className="test-card-header">
             <span className="test-card-title">
               <CheckCircle2 size={16} />
-              Registro de Eventos Detectados
+              {t("tests.events_card")}
             </span>
             <span className="test-card-badge">
-              {events.length} {events.length === 1 ? "evento" : "eventos"}
+              {events.length} {events.length === 1 ? t("tests.event_singular") : t("tests.event_plural")}
             </span>
           </div>
 
           {events.length === 0 ? (
             <div className="test-empty-state">
               <Keyboard size={40} />
-              <strong style={{ fontSize: "13px", color: "var(--text)" }}>Nenhum evento registrado</strong>
+              <strong style={{ fontSize: "13px", color: "var(--text)" }}>{t("tests.no_events")}</strong>
               <p style={{ margin: 0, fontSize: "11px", maxWidth: "260px" }}>
-                Ative o foco no bloco à esquerda e acione teclas normais, combinações ou teclas estendidas F13–F24.
+                {t("tests.no_events_desc")}
               </p>
             </div>
           ) : (

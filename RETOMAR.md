@@ -2,7 +2,7 @@
 
 Projeto ativo: Web e novo Desktop Windows, com interface e serviços compartilhados.
 
-Última sessão encerrada em 29/10/2026: [release 0.4.0 e verificações finais](docs/ENCERRAMENTO_20261029_STUDIO_040.md).
+Versão ativa: **LittleTec Studio 0.5.0** (Internacionalização PT/EN/ES, Playground de Testes, Presets Populares e Sincronização Web/Desktop).
 
 1. Ler `AGENTS.md`, `docs/ESTADO_ATUAL.md` e `docs/README.md`.
 2. Desktop pronto: `LittleTec-Studio.exe` na raiz. Web local: `Abrir-Web.cmd`.

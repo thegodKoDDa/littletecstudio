@@ -5,4 +5,5 @@ contextBridge.exposeInMainWorld('littleTecDesktop', {
   request: (command: unknown) => ipcRenderer.invoke('device:request', command),
   saveJson: (value: unknown, name: string) => ipcRenderer.invoke('file:save-json', value, name),
   createShortcuts: () => ipcRenderer.invoke('desktop:create-shortcuts'),
+  openExternal: (url: string) => ipcRenderer.invoke('desktop:open-external', url),
 });

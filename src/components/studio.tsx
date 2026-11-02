@@ -12,8 +12,10 @@ import {
   CircleHelp,
   Copy,
   Download,
+  ExternalLink,
   FilePlus2,
   FolderOpen,
+  Globe,
   Keyboard,
   Layers3,
   Lightbulb,
@@ -69,30 +71,30 @@ type Page =
   | "Testes";
 const storageKey = "littletec-web-draft-v1";
 type Notice = { text: string; error?: boolean };
-const pageInfo: Record<Page, { title: string; description: string }> = {
+const pageInfoKeys: Record<Page, { title: string; description: string }> = {
   Mapeamento: {
-    title: "Um teclado. Infinitas possibilidades.",
-    description: "Transforme pequenos movimentos em grandes atalhos.",
+    title: "page.mapping.title",
+    description: "page.mapping.desc",
   },
   Giratórios: {
-    title: "Seu ritmo, em cada giro.",
-    description: "Personalize cada direção e acompanhe seus controles ao vivo.",
+    title: "page.knobs.title",
+    description: "page.knobs.desc",
   },
   Iluminação: {
-    title: "Encontre a sua frequência.",
-    description: "A cor certa para cada jeito de trabalhar.",
+    title: "page.lighting.title",
+    description: "page.lighting.desc",
   },
   Perfis: {
-    title: "Seu fluxo, sempre à mão.",
-    description: "Crie, organize e leve suas configurações com você.",
+    title: "page.profiles.title",
+    description: "page.profiles.desc",
   },
   Diagnóstico: {
-    title: "Tudo no lugar.",
-    description: "Conexão, cópias e informações do seu dispositivo.",
+    title: "page.diagnostics.title",
+    description: "page.diagnostics.desc",
   },
   Testes: {
-    title: "Tudo sob controle.",
-    description: "Teste suas teclas, atalhos e sequências em tempo real.",
+    title: "page.tests.title",
+    description: "page.tests.desc",
   },
 };
 export function Studio() {
@@ -135,6 +137,7 @@ export function Studio() {
   const isDesktop = ready && typeof window !== "undefined" && !!window.littleTecDesktop;
   const [review, setReview] = useState(false);
   const [help, setHelp] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [diagnostic, setDiagnostic] = useState<unknown>(null);
   const [lastSent, setLastSent] = useState<(string | null)[]>([
     null,
@@ -607,24 +610,24 @@ export function Studio() {
           </span>
         </a>
         <div className="workspace-label">
-          SEU ESPAÇO <span>01</span>
+          {t("sidebar.workspace")} <span>01</span>
         </div>
         <nav aria-label="Navegação principal">
           {[
-            { name: "Mapeamento", icon: Keyboard },
-            { name: "Giratórios", icon: SlidersHorizontal },
-            { name: "Iluminação", icon: Lightbulb },
-            { name: "Perfis", icon: Layers3 },
-            { name: "Testes", icon: PlayCircle },
-          ].map(({ name, icon: Icon }) => (
+            { id: "Mapeamento" as Page, labelKey: "nav.mapping", icon: Keyboard },
+            { id: "Giratórios" as Page, labelKey: "nav.knobs", icon: SlidersHorizontal },
+            { id: "Iluminação" as Page, labelKey: "nav.lighting", icon: Lightbulb },
+            { id: "Perfis" as Page, labelKey: "nav.profiles", icon: Layers3 },
+            { id: "Testes" as Page, labelKey: "nav.tests", icon: PlayCircle },
+          ].map(({ id, labelKey, icon: Icon }) => (
             <button
-              key={name}
-              aria-label={name}
-              className={page === name ? "active" : ""}
+              key={id}
+              aria-label={t(labelKey)}
+              className={page === id ? "active" : ""}
               onClick={() => {
-                setPage(name as Page);
+                setPage(id);
                 if (
-                  name === "Giratórios" &&
+                  id === "Giratórios" &&
                   profile.encoder_count &&
                   selected < profile.key_count
                 )
@@ -632,13 +635,13 @@ export function Studio() {
               }}
             >
               <Icon size={18} />
-              <span>{name}</span>
-              {page === name && <span className="nav-indicator" />}
+              <span>{t(labelKey)}</span>
+              {page === id && <span className="nav-indicator" />}
             </button>
           ))}
         </nav>
         <div className="sidebar-divider" />
-        <div className="workspace-label">DISPOSITIVO</div>
+        <div className="workspace-label">{t("sidebar.device")}</div>
         <button className="device-card" onClick={() => setPage("Diagnóstico")}>
           <span className="device-mini">
             <Keyboard size={27} />
@@ -649,7 +652,7 @@ export function Studio() {
               <i
                 className={connected ? "status-dot connected" : "status-dot"}
               />
-              {connected ? "Conectado via USB" : "Editor local"}
+              {connected ? t("device.connected_usb") : t("device.editor_local")}
             </small>
           </span>
           <ChevronDown size={14} />
@@ -659,11 +662,9 @@ export function Studio() {
             <span className="local-icon">
               <ShieldCheck size={17} />
             </span>
-            <strong>Seu teclado. Seus dados.</strong>
-            <p>
-              Rascunhos salvos {isDesktop ? "neste aplicativo" : "neste navegador"}.
-              <br />
-              Sem conta, sem nuvem.
+            <strong>{t("sidebar.security_title")}</strong>
+            <p style={{ whiteSpace: "pre-line" }}>
+              {isDesktop ? t("sidebar.security_desc_desktop") : t("sidebar.security_desc_web")}
             </p>
           </div>
           <button
@@ -671,11 +672,11 @@ export function Studio() {
             onClick={() => setPage("Diagnóstico")}
           >
             <Settings2 size={17} />
-            Diagnóstico
+            {t("nav.diagnostics")}
           </button>
           <button className="utility" onClick={() => setHelp(true)}>
             <CircleHelp size={17} />
-            Primeiros passos
+            {t("sidebar.getting_started")}
             <ArrowUpRight size={14} />
           </button>
           <button
@@ -683,8 +684,8 @@ export function Studio() {
             aria-label="Alternar tema"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}Tema{" "}
-            {theme === "dark" ? "claro" : "escuro"}
+            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+            {theme === "dark" ? t("sidebar.theme_light") : t("sidebar.theme_dark")}
           </button>
           <div className="sidebar-footer">
             <span>LittleTec Studio</span>
@@ -696,18 +697,95 @@ export function Studio() {
         <header className="topbar">
           <div className="breadcrumb">
             Studio <span>/</span>
-            <strong>{page}</strong>
+            <strong>
+              {t(
+                page === "Mapeamento"
+                  ? "nav.mapping"
+                  : page === "Giratórios"
+                    ? "nav.knobs"
+                    : page === "Iluminação"
+                      ? "nav.lighting"
+                      : page === "Perfis"
+                        ? "nav.profiles"
+                        : page === "Diagnóstico"
+                          ? "nav.diagnostics"
+                          : "nav.tests"
+              )}
+            </strong>
           </div>
           <div className="topbar-actions">
+            {/* Seletor de Idioma */}
+            <div className="lang-switcher" aria-label={t("sidebar.language")}>
+              <span className="lang-icon" title={t("sidebar.language")}>
+                <Globe size={13} />
+              </span>
+              <button
+                type="button"
+                className={lang === "pt-BR" ? "active" : ""}
+                onClick={() => changeLanguage("pt-BR")}
+                title="Português (Brasil)"
+              >
+                PT
+              </button>
+              <button
+                type="button"
+                className={lang === "en" ? "active" : ""}
+                onClick={() => changeLanguage("en")}
+                title="English"
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                className={lang === "es" ? "active" : ""}
+                onClick={() => changeLanguage("es")}
+                title="Español"
+              >
+                ES
+              </button>
+            </div>
+
+            {/* Ação de plataforma: Baixar Desktop (Web) ou Acessar Web (Desktop) */}
+            {!isDesktop ? (
+              <button
+                type="button"
+                className="platform-action-btn"
+                title={t("action.download_desktop_hint")}
+                onClick={() => setShowDownloadModal(true)}
+              >
+                <Download size={14} />
+                <span>{t("action.download_desktop")}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="platform-action-btn web-btn"
+                title={t("action.open_web_hint")}
+                onClick={() => {
+                  const webUrl = "https://thegodkodda.github.io/littletecstudio";
+                  if (window.littleTecDesktop?.openExternal) {
+                    window.littleTecDesktop.openExternal(webUrl);
+                  } else {
+                    window.open(webUrl, "_blank");
+                  }
+                }}
+              >
+                <ExternalLink size={14} />
+                <span>{t("action.open_web")}</span>
+              </button>
+            )}
+
+            <span className="topbar-divider" />
+
             <span className="local-state">
               <i
                 className={connected ? "status-dot connected" : "status-dot"}
               />
               {busy
-                ? "Operação em andamento"
+                ? t("device.busy")
                 : connected
-                  ? "Teclado conectado"
-                  : "Modo local"}
+                  ? t("device.connected")
+                  : t("device.local")}
             </span>
             <span className="topbar-divider" />
             <button
@@ -720,7 +798,7 @@ export function Studio() {
               ) : (
                 <Usb size={15} />
               )}{" "}
-              {connected ? "Ler teclado" : "Conectar teclado"}
+              {connected ? t("device.read") : t("device.connect")}
             </button>
           </div>
         </header>
@@ -731,8 +809,8 @@ export function Studio() {
                 <span />
                 LITTLETEC STUDIO <span className="web-tag">{isDesktop ? "DESKTOP EDITION" : "WEB EDITION"}</span>
               </div>
-              <h1>{pageInfo[page].title}</h1>
-              <p>{pageInfo[page].description}</p>
+              <h1>{t(pageInfoKeys[page].title)}</h1>
+              <p>{t(pageInfoKeys[page].description)}</p>
             </div>
             <button
               className="icon-button heading-help"
@@ -1601,33 +1679,10 @@ export function Studio() {
           )}
           <footer className="page-footer">
             <span>{t("footer.tagline")}</span>
-            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div className="language-selector" style={{ display: "flex", gap: "4px" }}>
-                {(["pt-BR", "en", "es"] as const).map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    style={{
-                      padding: "2px 6px",
-                      borderRadius: "4px",
-                      fontSize: "10px",
-                      fontWeight: lang === l ? 700 : 500,
-                      background: lang === l ? "var(--accent)" : "var(--panel-2)",
-                      color: lang === l ? "#000" : "var(--muted)",
-                      border: "1px solid var(--border)",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => changeLanguage(l)}
-                  >
-                    {l === "pt-BR" ? "PT" : l.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-              <span>
-                {t("footer.spec")}
-                <span className="footer-square" />
-              </span>
-            </div>
+            <span>
+              {t("footer.spec")}
+              <span className="footer-square" />
+            </span>
           </footer>
         </main>
         <div className="apply-bar">
@@ -1827,6 +1882,66 @@ export function Studio() {
             >
               Vamos começar <ArrowRight size={16} />
             </button>
+          </section>
+        </div>
+      )}
+      {showDownloadModal && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setShowDownloadModal(false)}
+        >
+          <section
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("modal.download_title")}
+            style={{ maxWidth: "560px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-heading">
+              <div>
+                <span className="eyebrow">LITTLETEC STUDIO · WINDOWS</span>
+                <h2>{t("modal.download_title")}</h2>
+              </div>
+              <button
+                className="icon-button"
+                onClick={() => setShowDownloadModal(false)}
+                aria-label="Fechar"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p style={{ marginTop: "12px", color: "var(--muted)", fontSize: "13px", lineHeight: "1.6" }}>
+              {t("modal.download_desc")}
+            </p>
+            <div className="download-card-preview">
+              <div className="download-card-icon">
+                <Download size={22} />
+              </div>
+              <div className="download-card-info">
+                <strong>{t("modal.download_file")}</strong>
+                <span>Windows 10 / 11 · 64-bit · Plug-and-Play</span>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "10px", marginTop: "24px", justifyContent: "flex-end" }}>
+              <a
+                href="https://github.com/thegodKoDDa/littletecstudio/releases"
+                target="_blank"
+                rel="noreferrer"
+                className="button secondary"
+              >
+                <ExternalLink size={14} />
+                {t("modal.github_releases")}
+              </a>
+              <a
+                href="https://github.com/thegodKoDDa/littletecstudio/releases/latest/download/LittleTec-Studio.exe"
+                className="button primary"
+                download="LittleTec-Studio.exe"
+              >
+                <Download size={14} />
+                {t("modal.download_now")}
+              </a>
+            </div>
           </section>
         </div>
       )}

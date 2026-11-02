@@ -7,6 +7,7 @@ declare global {
       request(command: unknown): Promise<{ status: number; body: Record<string, unknown> }>;
       saveJson(value: unknown, name: string): Promise<boolean>;
       createShortcuts?(): Promise<{ success: boolean; message: string }>;
+      openExternal?(url: string): Promise<boolean>;
     };
   }
 }

@@ -58,6 +58,25 @@ uma leitura inicial quando a ponte Windows está disponível. Sem ponte/aparelho
 o editor continua disponível. Não há repetição automática de gravações nem
 aplicação de mapeamento ou iluminação na inicialização.
 
+## Sincronização contínua (Web e Desktop)
+
+Para garantir paridade absoluta e evitar que alterações fiquem desatualizadas entre Web e Desktop:
+
+- **Comando unificado (`npm run sync`)**:
+  1. Encerra instâncias antigas presas em segundo plano no Windows via `taskkill`.
+  2. Sincroniza ícones oficiais (16 a 256px com DIBs nativos).
+  3. Compila a interface unificada simultaneamente para `build/desktop-ui` e `build/web-portable`.
+  4. Empacota o `resources/app.asar` e atualiza os ZIPs de distribuição.
+  5. Recompila o `.NET Launcher` em `LittleTec-Studio.exe` e `release/LittleTec-Studio.exe`.
+  6. Atualiza `release/SHA256SUMS-desktop.txt` e `release/SHA256SUMS-web.txt`.
+  7. Atualiza atalhos da Área de Trabalho e Menu Iniciar para apontar sempre para o binário raiz.
+  8. Valida o carregamento sem erros via smoke test.
+
+- **Modo observador em tempo real (`npm run sync:watch`)**:
+  - Monitora as pastas `src/`, `desktop/` e `public/` com debounce de 400 ms.
+  - Qualquer alteração de código ou estilo sincroniza imediatamente a versão desktop e web portátil sem necessidade de comandos manuais.
+
+
 Rascunhos salvos são mantidos sem perguntar para substituí-los. Alterações feitas
 durante a leitura também são preservadas; o snapshot lido atualiza a referência
 do aparelho. O botão Conectar teclado / Ler teclado continua disponível e a

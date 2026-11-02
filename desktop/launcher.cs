@@ -118,11 +118,30 @@ internal static class Launcher {
             string digest = ResourceText("payload.sha256");
             bool cacheHit;
             string folder = Prepare(digest, out cacheHit);
+
+            // Se for atualização ou troca de versão, encerra processos antigos para não travar na instância única
+            if (!cacheHit) {
+                try {
+                    int currentId = Process.GetCurrentProcess().Id;
+                    foreach (var p in Process.GetProcessesByName("LittleTec-Studio")) {
+                        if (p.Id != currentId) {
+                            try { p.Kill(); p.WaitForExit(3000); } catch { }
+                        }
+                    }
+                    foreach (var p in Process.GetProcessesByName("LittleTec-Bridge")) {
+                        try { p.Kill(); p.WaitForExit(3000); } catch { }
+                    }
+                } catch { }
+            }
+
             var start = new ProcessStartInfo(Path.Combine(folder, "LittleTec-Studio.exe")) {
                 WorkingDirectory = folder, UseShellExecute = false, CreateNoWindow = true,
                 Arguments = String.Join(" ", arguments.Where(a => a == "--smoke" || a == "--smoke-close-window" || a == "--offline"))
             };
             start.EnvironmentVariables.Remove("ELECTRON_RUN_AS_NODE");
+            try {
+                start.EnvironmentVariables["LITTLETEC_LAUNCHER_EXE"] = Assembly.GetExecutingAssembly().Location;
+            } catch { }
             using (var process = Process.Start(start)) {
                 Log(String.Format("cache={0} launcher_ms={1} version={2}", cacheHit ? "hit" : "miss", timer.ElapsedMilliseconds, ResourceText("payload.version")));
                 if (smoke) {

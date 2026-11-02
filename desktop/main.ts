@@ -120,8 +120,8 @@ else {
         return { success: false, message: 'Criação de atalhos disponível no Windows.' };
       }
       try {
-        const exePath = app.getPath('exe');
-        const iconPath = path.join(root, 'desktop', 'icon.ico');
+        const exePath = process.env.LITTLETEC_LAUNCHER_EXE || app.getPath('exe');
+        const iconPath = process.env.LITTLETEC_LAUNCHER_EXE || path.join(root, 'desktop', 'icon.ico');
         const desktopLnk = path.join(app.getPath('desktop'), 'LittleTec Studio.lnk');
         const startMenuLnk = path.join(
           app.getPath('appData'),

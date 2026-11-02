@@ -122,3 +122,18 @@ test("migra perfil v1 de 12 teclas sem perder ações", () => {
   assert.equal(result.encoder_count, 0);
   assert.deepEqual(result.layers[0][0], keyboard("A", ["Ctrl"]));
 });
+
+test("modelos populares por aplicativo geram perfis 12+2 válidos e completos", async () => {
+  const { POPULAR_PRESETS } = await import("../src/lib/popular-presets");
+  assert.equal(POPULAR_PRESETS.length, 4);
+  for (const preset of POPULAR_PRESETS) {
+    const profile = preset.createProfile();
+    assert.equal(profile.key_count, 12);
+    assert.equal(profile.encoder_count, 2);
+    assert.equal(profile.layers.length, 3);
+    for (const layer of profile.layers) {
+      assert.equal(layer.length, 18);
+    }
+    assert.doesNotThrow(() => parseProfile(profile));
+  }
+});

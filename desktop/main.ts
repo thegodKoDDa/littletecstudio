@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, net, protocol, session } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, net, protocol, session, shell, Tray } from 'electron';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -15,6 +15,7 @@ app.setPath('userData', (!app.isPackaged && process.env.LITTLETEC_TEST_USER_DATA
 
 let window: BrowserWindow | null = null;
 let bridge: DesktopBridge | null = null;
+let tray: Tray | null = null;
 let quitting = false;
 let stopping = false;
 const origin = 'littletec://studio';
@@ -111,6 +112,40 @@ else {
       }
     });
 
+    ipcMain.handle('desktop:create-shortcuts', async (event) => {
+      if (event.sender !== window?.webContents || !event.senderFrame?.url.startsWith(origin + '/')) {
+        throw new Error('Origem não autorizada.');
+      }
+      if (process.platform !== 'win32') {
+        return { success: false, message: 'Criação de atalhos disponível no Windows.' };
+      }
+      try {
+        const exePath = app.getPath('exe');
+        const iconPath = path.join(root, 'desktop', 'icon.ico');
+        const desktopLnk = path.join(app.getPath('desktop'), 'LittleTec Studio.lnk');
+        const startMenuLnk = path.join(
+          app.getPath('appData'),
+          'Microsoft',
+          'Windows',
+          'Start Menu',
+          'Programs',
+          'LittleTec Studio.lnk',
+        );
+        const details = {
+          target: exePath,
+          icon: iconPath,
+          iconIndex: 0,
+          description: 'Configurador LittleTec Studio',
+          workingDirectory: path.dirname(exePath),
+        };
+        shell.writeShortcutLink(desktopLnk, 'create', details);
+        shell.writeShortcutLink(startMenuLnk, 'create', details);
+        return { success: true, message: 'Atalhos criados com sucesso na Área de Trabalho e no Menu Iniciar.' };
+      } catch (e) {
+        return { success: false, message: (e as Error).message };
+      }
+    });
+
     window = new BrowserWindow({
       width: 1440, height: 1000, minWidth: 900, minHeight: 650,
       title: 'LittleTec Studio', backgroundColor: '#111412', show: false,
@@ -123,7 +158,57 @@ else {
       },
     });
     window.setMenu(null);
+    window.on('close', (event) => {
+      if (!quitting && !smoke && !process.env.LITTLETEC_TEST_USER_DATA && tray) {
+        event.preventDefault();
+        window?.hide();
+      }
+    });
     window.once('closed', () => { window = null; });
+
+    if (!smoke && !process.env.LITTLETEC_TEST_USER_DATA) {
+      try {
+        const trayIcon = path.join(root, 'desktop', 'icon.png');
+        tray = new Tray(trayIcon);
+        tray.setToolTip('LittleTec Studio');
+        const contextMenu = Menu.buildFromTemplate([
+          {
+            label: 'Abrir LittleTec Studio',
+            click: () => {
+              if (window) {
+                if (window.isMinimized()) window.restore();
+                window.show();
+                window.focus();
+              }
+            },
+          },
+          {
+            label: 'Ocultar na bandeja',
+            click: () => {
+              window?.hide();
+            },
+          },
+          { type: 'separator' },
+          {
+            label: 'Encerrar LittleTec Studio',
+            click: () => {
+              quitting = true;
+              app.quit();
+            },
+          },
+        ]);
+        tray.setContextMenu(contextMenu);
+        tray.on('double-click', () => {
+          if (window) {
+            if (window.isMinimized()) window.restore();
+            window.show();
+            window.focus();
+          }
+        });
+      } catch {
+        /* Prosseguir normalmente se o ambiente não suportar bandeja gráfica. */
+      }
+    }
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     window.webContents.on('will-navigate', (event, url) => {
       if (url !== origin + '/') event.preventDefault();

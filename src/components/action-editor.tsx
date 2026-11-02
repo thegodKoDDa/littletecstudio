@@ -14,6 +14,7 @@ import {
   X,
   WandSparkles,
   GripVertical,
+  Disc,
 } from "lucide-react";
 import catalog from "@/lib/catalog.json";
 import {
@@ -55,6 +56,8 @@ export function ActionEditor({
   const [textError, setTextError] = useState("");
   const [stepEdit, setStepEdit] = useState<number | null>(null);
   const [autoAdvance, setAutoAdvance] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [recordedSteps, setRecordedSteps] = useState<{ key: string; modifiers: Modifier[] }[]>([]);
   const entries: { title: string; action: Action }[] =
     tab === "Atalhos"
       ? catalog.SHORTCUT_PRESETS.map(([title, steps]) => ({
@@ -195,6 +198,7 @@ export function ActionEditor({
         {[
           { name: "Atalhos", icon: WandSparkles },
           { name: "Teclado", icon: Keyboard },
+          { name: "Gravar", icon: Disc },
           { name: "Mídia", icon: Music2 },
           { name: "Mouse", icon: MousePointer2 },
           { name: "Atraso", icon: Timer },
@@ -211,7 +215,98 @@ export function ActionEditor({
           </button>
         ))}
       </div>
-      {tab === "Atraso" ? (
+      {tab === "Gravar" ? (
+        <div className="macro-recorder">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+            <span className="eyebrow">GRAVADOR DE MACRO AO VIVO</span>
+            <span style={{ fontSize: "10px", fontFamily: "monospace", padding: "2px 8px", borderRadius: "10px", background: "var(--panel)", border: "1px solid var(--border)", color: "var(--muted)" }}>
+              {recordedSteps.length}/20 etapas
+            </span>
+          </div>
+
+          <div
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (!recording) return;
+              e.preventDefault();
+              e.stopPropagation();
+              const action = fromKeyEvent(e);
+              if (action && action.type === "keyboard") {
+                const step = action.steps[0];
+                if (recordedSteps.length >= 20) {
+                  setTextError("Limite máximo de 20 etapas atingido.");
+                  setRecording(false);
+                  return;
+                }
+                setRecordedSteps((prev) => [...prev, step]);
+              }
+            }}
+            className={`macro-recorder-capture ${recording ? "recording" : ""}`}
+            onClick={() => setRecording(!recording)}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "40px", height: "40px", borderRadius: "50%", background: "var(--panel-2)", border: "1px solid var(--border)" }}>
+              <Disc size={20} color={recording ? "#ff5c5c" : "var(--accent)"} className={recording ? "spin" : ""} />
+            </div>
+            <strong style={{ fontSize: "13px", color: "var(--text)" }}>
+              {recording ? "Gravando… Pressione as teclas em ordem no teclado" : "Clique para Iniciar a Gravação"}
+            </strong>
+            <small style={{ fontSize: "11px", color: "var(--muted)" }}>
+              {recording
+                ? "Cada toque com seus modificadores será adicionado como uma etapa"
+                : "As teclas digitadas serão adicionadas à sequência (até 20 etapas)"}
+            </small>
+          </div>
+
+          {recordedSteps.length > 0 && (
+            <div style={{ marginTop: "14px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "var(--muted)", marginBottom: "6px" }}>
+                <span>Etapas Gravadas:</span>
+                <button
+                  type="button"
+                  onClick={() => setRecordedSteps([])}
+                  className="text-button"
+                  style={{ fontSize: "11px", color: "#ff7777" }}
+                >
+                  <Trash2 size={12} /> Limpar
+                </button>
+              </div>
+              <div className="macro-recorder-steps">
+                {recordedSteps.map((s, idx) => (
+                  <div key={idx} className="macro-recorder-step">
+                    <span style={{ color: "var(--muted)", marginRight: "8px" }}>{idx + 1}.</span>
+                    <strong style={{ color: "var(--text)", fontFamily: "monospace" }}>{label(keyboard(s.key, s.modifiers))}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+            <button
+              className="button secondary"
+              type="button"
+              onClick={() => setRecording(!recording)}
+              style={{ flex: 1 }}
+            >
+              {recording ? "Pausar Gravação" : "Continuar Gravação"}
+            </button>
+            <button
+              className="button primary"
+              type="button"
+              disabled={recordedSteps.length === 0}
+              onClick={() => {
+                if (recordedSteps.length > 0) {
+                  onAssign({ type: "keyboard", steps: recordedSteps });
+                  setRecording(false);
+                }
+              }}
+              style={{ flex: 1 }}
+            >
+              Atribuir Sequência ({recordedSteps.length}) <Check size={14} />
+            </button>
+          </div>
+        </div>
+      ) : tab === "Atraso" ? (
         <div className="delay-editor">
           <label className="field-label" htmlFor="delay">
             Tempo de espera

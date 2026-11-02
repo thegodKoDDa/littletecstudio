@@ -3,6 +3,10 @@ const path = require('node:path');
 
 module.exports = async context => {
   if (context.electronPlatformName !== 'win32') return;
+  if (process.platform !== 'win32') {
+    // No Linux/WSL o electron-builder já embute desktop/icon.ico nativamente via rcedit.
+    return;
+  }
   const root = context.packager.projectDir;
   const python = process.env.LITTLETEC_PYTHON || path.join(root, '.venv-windows', 'Scripts', 'python.exe');
   const executable = path.join(context.appOutDir, 'LittleTec-Studio.exe');

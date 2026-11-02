@@ -32,6 +32,7 @@ import {
   Upload,
   Usb,
   X,
+  PlayCircle,
 } from "lucide-react";
 import catalog from "@/lib/catalog.json";
 import {
@@ -48,6 +49,10 @@ import {
 } from "@/lib/profile";
 import { deviceRequest } from "@/lib/device";
 import { shouldAutoConnect } from "@/lib/auto-connect";
+import { POPULAR_PRESETS } from "@/lib/popular-presets";
+import { useI18n } from "@/lib/i18n";
+import { isWebHIDSupported, requestWebHIDDevice } from "@/lib/webhid";
+import { KeyTester } from "./key-tester";
 import { ProjectLogo } from "./project-logo";
 import { Board } from "./board";
 import { ActionEditor } from "./action-editor";
@@ -60,7 +65,8 @@ type Page =
   | "Giratórios"
   | "Iluminação"
   | "Perfis"
-  | "Diagnóstico";
+  | "Diagnóstico"
+  | "Testes";
 const storageKey = "littletec-web-draft-v1";
 type Notice = { text: string; error?: boolean };
 const pageInfo: Record<Page, { title: string; description: string }> = {
@@ -84,8 +90,13 @@ const pageInfo: Record<Page, { title: string; description: string }> = {
     title: "Tudo no lugar.",
     description: "Conexão, cópias e informações do seu dispositivo.",
   },
+  Testes: {
+    title: "Tudo sob controle.",
+    description: "Teste suas teclas, atalhos e sequências em tempo real.",
+  },
 };
 export function Studio() {
+  const { lang, changeLanguage, t } = useI18n();
   const [profile, setProfile] = useState<Profile>(exampleProfile);
   const [baseline, setBaseline] = useState<Profile>(exampleProfile);
   const [fileSaved, setFileSaved] = useState<string>("");
@@ -604,6 +615,7 @@ export function Studio() {
             { name: "Giratórios", icon: SlidersHorizontal },
             { name: "Iluminação", icon: Lightbulb },
             { name: "Perfis", icon: Layers3 },
+            { name: "Testes", icon: PlayCircle },
           ].map(({ name, icon: Icon }) => (
             <button
               key={name}
@@ -1228,6 +1240,41 @@ export function Studio() {
             <section className="profiles-page">
               <div className="section-heading">
                 <span>
+                  <Sparkles size={16} /> MODELOS PRONTOS POR APLICATIVO
+                </span>
+                <span>Configurações completas de 1 clique para o modelo 12+2</span>
+              </div>
+              <div className="popular-presets-grid mb-8">
+                {POPULAR_PRESETS.map((preset) => (
+                  <div key={preset.id} className="popular-preset-card">
+                    <div className="preset-card-header">
+                      <span className="preset-badge">{preset.badge}</span>
+                    </div>
+                    <h3>{preset.title}</h3>
+                    <div className="preset-subtitle">{preset.subtitle}</div>
+                    <p>{preset.description}</p>
+                    <div className="preset-tags">
+                      {preset.tags.map((t) => (
+                        <span key={t} className="preset-tag">{t}</span>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      className="button secondary full"
+                      onClick={() => {
+                        const newP = preset.createProfile();
+                        update(newP);
+                        setNotice({ text: `Perfil "${preset.title}" aplicado com sucesso.` });
+                        setPage("Mapeamento");
+                      }}
+                    >
+                      Aplicar modelo <ArrowRight size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="section-heading">
+                <span>
                   <FolderOpen size={16} /> SUA BIBLIOTECA
                 </span>
                 <span>{savedProfiles.length} perfis {isDesktop ? "neste aplicativo" : "neste navegador"}</span>
@@ -1460,6 +1507,24 @@ export function Studio() {
                   <PlugZap size={16} />
                   {connected ? "Atualizar leitura" : "Conectar teclado"}
                 </button>
+                {!isDesktop && !connected && isWebHIDSupported() && (
+                  <button
+                    className="button secondary"
+                    onClick={async () => {
+                      try {
+                        const dev = await requestWebHIDDevice();
+                        if (dev) {
+                          setNotice({ text: `Dispositivo ${dev.productName || "LittleTec"} pareado via WebHID!` });
+                        }
+                      } catch (err) {
+                        setNotice({ text: `WebHID: ${(err as Error).message}`, error: true });
+                      }
+                    }}
+                  >
+                    <Usb size={16} />
+                    Conectar via WebHID (Navegador)
+                  </button>
+                )}
               </div>
               <div className="diagnostic-grid">
                 {[
@@ -1507,6 +1572,20 @@ export function Studio() {
                   <Download size={16} />
                   Exportar diagnóstico
                 </button>
+                {isDesktop && (
+                  <button
+                    className="button secondary"
+                    onClick={async () => {
+                      if (window.littleTecDesktop?.createShortcuts) {
+                        const res = await window.littleTecDesktop.createShortcuts();
+                        setNotice({ text: res.message, error: !res.success });
+                      }
+                    }}
+                  >
+                    <ArrowUpRight size={16} />
+                    Criar atalhos no Windows
+                  </button>
+                )}
               </div>
               {diagnostic !== null && (
                 <pre className="diagnostic-output">
@@ -1515,12 +1594,40 @@ export function Studio() {
               )}
             </section>
           )}
+          {page === "Testes" && (
+            <section className="tests-page">
+              <KeyTester />
+            </section>
+          )}
           <footer className="page-footer">
-            <span>Feito para o seu jeito de fazer.</span>
-            <span>
-              12 teclas. 2 giros. Seu controle.
-              <span className="footer-square" />
-            </span>
+            <span>{t("footer.tagline")}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <div className="language-selector" style={{ display: "flex", gap: "4px" }}>
+                {(["pt-BR", "en", "es"] as const).map((l) => (
+                  <button
+                    key={l}
+                    type="button"
+                    style={{
+                      padding: "2px 6px",
+                      borderRadius: "4px",
+                      fontSize: "10px",
+                      fontWeight: lang === l ? 700 : 500,
+                      background: lang === l ? "var(--accent)" : "var(--panel-2)",
+                      color: lang === l ? "#000" : "var(--muted)",
+                      border: "1px solid var(--border)",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => changeLanguage(l)}
+                  >
+                    {l === "pt-BR" ? "PT" : l.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+              <span>
+                {t("footer.spec")}
+                <span className="footer-square" />
+              </span>
+            </div>
           </footer>
         </main>
         <div className="apply-bar">

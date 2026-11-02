@@ -5,7 +5,12 @@ Alterações em Web e Desktop do LittleTec Studio, em 29/10/2026. O OG não foi 
 ## Um símbolo
 
 A fonte é `desktop/icon.png`. O build deriva um ICO com sete tamanhos (16, 24,
-32, 48, 64, 128 e 256), favicon, ícone do navegador e Apple. A marca na interface
+32, 48, 64, 128 e 256), favicon, ícone do navegador e Apple. Para total compatibilidade
+com o subsistema de ícones do Windows Shell (Explorer, Área de Trabalho, atalhos .lnk e
+o cache persistente `IconCache.db`), os tamanhos de 16 a 128 utilizam o formato nativo DIB
+(BITMAPINFOHEADER 40 bytes, BGRA 32-bit bottom-up e máscara AND de 1 bit), enquanto o
+tamanho 256 utiliza PNG compactado. Isso impede que o Windows Explorer descarte o ícone
+ou exiba a folha genérica branca após a reinicialização do sistema. A marca na interface
 importa o mesmo PNG. O ICO é incorporado ao lançador portátil, ao executável
 Electron e à ponte Python. A verificação lê os recursos PE dos executáveis
 prontos e compara cada imagem aos bytes gerados do PNG oficial.

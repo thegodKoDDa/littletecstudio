@@ -158,12 +158,6 @@ else {
       },
     });
     window.setMenu(null);
-    window.on('close', (event) => {
-      if (!quitting && !smoke && !process.env.LITTLETEC_TEST_USER_DATA && tray) {
-        event.preventDefault();
-        window?.hide();
-      }
-    });
     window.once('closed', () => { window = null; });
 
     if (!smoke && !process.env.LITTLETEC_TEST_USER_DATA) {

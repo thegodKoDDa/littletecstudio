@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { build } from 'esbuild';
@@ -76,9 +76,41 @@ export async function syncAll({ killRunning = true, smokeTest = true } = {}) {
   const desktopArchive = `LittleTec-Studio-${version}-win-x64.zip`;
   const webArchive = `LittleTec-Studio-Web-${version}.zip`;
 
-  // Atualizar zip do desktop
+  // Atualizar zip do desktop garantindo integridade de todos os binários
   const desktopZip = path.resolve(path.join('release', desktopArchive));
-  run('zip', ['-q', desktopZip, 'resources/app.asar'], {
+  let isComplete = false;
+  if (existsSync(desktopZip)) {
+    try {
+      const check = spawnSync('unzip', ['-l', desktopZip, 'LittleTec-Studio.exe'], { stdio: 'pipe' });
+      isComplete = check.status === 0;
+    } catch {
+      isComplete = false;
+    }
+  }
+
+  if (!isComplete) {
+    const previousZips = readdirSync('release')
+      .filter(f => f.startsWith('LittleTec-Studio-') && f.endsWith('-win-x64.zip') && f !== desktopArchive)
+      .sort();
+    let cloned = false;
+    for (let i = previousZips.length - 1; i >= 0; i--) {
+      const candidate = path.join('release', previousZips[i]);
+      const check = spawnSync('unzip', ['-l', candidate, 'LittleTec-Studio.exe'], { stdio: 'pipe' });
+      if (check.status === 0) {
+        console.log(`Clonando runtime completo de ${candidate} para ${desktopArchive}…`);
+        cpSync(candidate, desktopZip);
+        cloned = true;
+        break;
+      }
+    }
+    if (!cloned && existsSync('release/win-unpacked/LittleTec-Studio.exe')) {
+      console.log(`Gerando ${desktopArchive} completo a partir de release/win-unpacked…`);
+      rmSync(desktopZip, { force: true });
+      run('zip', ['-qr', desktopZip, '.'], { cwd: 'release/win-unpacked' });
+    }
+  }
+
+  run('zip', ['-q', desktopZip, 'resources/app.asar', 'LittleTec-Studio.exe', 'resources/bridge/LittleTec-Bridge.exe'], {
     cwd: 'release/win-unpacked',
   });
 
@@ -97,7 +129,19 @@ export async function syncAll({ killRunning = true, smokeTest = true } = {}) {
     : path.resolve('.venv-windows/Scripts/python.exe'));
 
   if (existsSync(python)) {
+    // Incorpora o ícone oficial nos executáveis de runtime antes de compilar o launcher
+    if (existsSync('release/win-unpacked/LittleTec-Studio.exe')) {
+      run(python, ['-X', 'utf8', 'tools/set-windows-icon.py', 'release/win-unpacked/LittleTec-Studio.exe', 'desktop/icon.ico'], { allowFailure: true });
+    }
+    const bridge = existsSync('build/bridge/LittleTec-Bridge/LittleTec-Bridge.exe')
+      ? 'build/bridge/LittleTec-Bridge/LittleTec-Bridge.exe'
+      : 'release/win-unpacked/resources/bridge/LittleTec-Bridge.exe';
+    if (existsSync(bridge)) {
+      run(python, ['-X', 'utf8', 'tools/set-windows-icon.py', bridge, 'desktop/icon.ico'], { allowFailure: true });
+    }
+
     run(python, ['-X', 'utf8', 'tools/build-launcher.py', '--payload', path.join('release', desktopArchive)]);
+    run(python, ['-X', 'utf8', 'tools/verify-windows-icons.py', 'desktop/icon.ico', 'LittleTec-Studio.exe']);
   }
 
   // 7. Atualizar checksums SHA-256
@@ -120,7 +164,7 @@ export async function syncAll({ killRunning = true, smokeTest = true } = {}) {
       if (Test-Path $desktopLnk) {
         $s = $ws.CreateShortcut($desktopLnk)
         $s.TargetPath = $exe
-        $s.IconLocation = "$exe,0"
+        if ($exe -notlike '\\\\*') { $s.IconLocation = "$exe,0" }
         $s.WorkingDirectory = (Split-Path $exe)
         $s.Save()
       }

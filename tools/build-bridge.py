@@ -31,11 +31,6 @@ def main():
         '--specpath', str(ROOT / 'build'),
         *licenses, str(ROOT / 'bridge/desktop.py'),
     ], check=True)
-    subprocess.run([
-        sys.executable, '-X', 'utf8', str(ROOT / 'tools/set-windows-icon.py'),
-        str(ROOT / 'build/bridge/LittleTec-Bridge/LittleTec-Bridge.exe'),
-        str(ROOT / 'desktop/icon.ico'),
-    ], check=True)
 
 
 if __name__ == '__main__':

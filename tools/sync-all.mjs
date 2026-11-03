@@ -129,15 +129,9 @@ export async function syncAll({ killRunning = true, smokeTest = true } = {}) {
     : path.resolve('.venv-windows/Scripts/python.exe'));
 
   if (existsSync(python)) {
-    // Incorpora o ícone oficial nos executáveis de runtime antes de compilar o launcher
+    // Incorpora o ícone oficial no executável Electron antes de compilar o launcher
     if (existsSync('release/win-unpacked/LittleTec-Studio.exe')) {
       run(python, ['-X', 'utf8', 'tools/set-windows-icon.py', 'release/win-unpacked/LittleTec-Studio.exe', 'desktop/icon.ico'], { allowFailure: true });
-    }
-    const bridge = existsSync('build/bridge/LittleTec-Bridge/LittleTec-Bridge.exe')
-      ? 'build/bridge/LittleTec-Bridge/LittleTec-Bridge.exe'
-      : 'release/win-unpacked/resources/bridge/LittleTec-Bridge.exe';
-    if (existsSync(bridge)) {
-      run(python, ['-X', 'utf8', 'tools/set-windows-icon.py', bridge, 'desktop/icon.ico'], { allowFailure: true });
     }
 
     run(python, ['-X', 'utf8', 'tools/build-launcher.py', '--payload', path.join('release', desktopArchive)]);

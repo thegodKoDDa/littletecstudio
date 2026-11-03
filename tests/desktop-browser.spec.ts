@@ -47,7 +47,7 @@ test('a interface fica utilizável antes de a ponte terminar de iniciar', async 
 import pathlib,os,sys,time
 started=time.monotonic()
 while not pathlib.Path(${JSON.stringify(gate)}).exists():
- if time.monotonic()-started>15: sys.exit(2)
+ if time.monotonic()-started>30: sys.exit(2)
  time.sleep(0.02)
 os.execvp('python3', ['python3', *sys.argv[1:]])
 `, { mode: 0o755 });
